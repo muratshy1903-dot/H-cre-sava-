@@ -14,7 +14,7 @@
     "stress": "node tests/stress.mjs"
   },
   "dependencies": {
-    "ws": "^8.18.3",
-    "sharp": "^0.34.5"
+    "sharp": "0.35.5",
+    "ws": "^8.18.3"
   }
 }
