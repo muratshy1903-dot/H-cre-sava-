@@ -10,7 +10,7 @@ test('round winner and true room-record flag reach other rooms and new joins; la
   assert.equal((await call('management',{action:'score',target:p.body.user.id,amount:400000,reason:'Record test'},admin.cookie)).status,200);
   const finish=()=>call('management',{action:'finishRoom',room:'FFA-1'},admin.cookie);
   const first=await wait(other,m=>m.type==='state'&&m.lastRound?.room==='FFA-1',()=>finish());assert.equal(first.lastRound.name,'Rekor Oyuncusu');assert.equal(first.lastRound.isRecord,true);assert.ok(first.lastRound.recordScore>=400000);assert.ok(first.lastRound.score>390000);
-  const newRoom=await connect('FFA-3');assert.equal(newRoom.messages.find(m=>m.type==='state').lastRound.name,'Rekor Oyuncusu');
+  const victories=(await call('victories/'+p.body.user.id)).body;assert.equal(victories.length,1);assert.equal(victories[0].room,'FFA-1');assert.equal(victories[0].score,first.lastRound.score);assert.equal('replay' in victories[0],false);const newRoom=await connect('FFA-3');assert.equal(newRoom.messages.find(m=>m.type==='state').lastRound.name,'Rekor Oyuncusu');
   const second=await wait(other,m=>m.type==='state'&&m.lastRound?.at>first.lastRound.at,()=>finish());assert.equal(second.lastRound.isRecord,false);assert.equal(second.lastRound.recordScore,first.lastRound.recordScore);
   const rooms=(await call('rooms')).body,room=rooms.find(r=>r.id==='FFA-1');assert.equal(room.recordName,'Rekor Oyuncusu');assert.equal(room.highestScore,first.lastRound.recordScore);
  }finally{for(const ws of sockets)ws.terminate();await new Promise(r=>server.shutdown(r));await rm(dir,{recursive:true,force:true})}

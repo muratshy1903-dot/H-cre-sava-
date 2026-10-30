@@ -1,5 +1,5 @@
 export const PASS_NAME='ZirvePass';
-export const PASS_PRICE=150000;
+export const PASS_PRICE=5000000;
 export const SEASON_ANCHOR=Date.parse('2026-10-29T21:00:00Z');
 export const SEASON_LENGTH=14*86400000;
 export const COSMETIC_TYPES={nick:'Nick stili',title:'Unvan',entry:'Odaya giriş',border:'Hücre kenarı',theme:'Sayfa teması'};

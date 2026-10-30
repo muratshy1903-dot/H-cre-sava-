@@ -1,7 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {mkdtemp,rm} from 'node:fs/promises';import os from 'node:os';import path from 'node:path';import crypto from 'node:crypto';import {once} from 'node:events';import {DatabaseSync} from 'node:sqlite';import WebSocket from 'ws';
 test('Pass API rejects forged XP and duplicate awards, debits once and shares equipped cosmetics in real game snapshots',async()=>{
  const dir=await mkdtemp(path.join(os.tmpdir(),'agarm-season-'));process.env.AGARM_DATA=dir;const {startServer}=await import('../server/index.js');const server=startServer({port:0});await once(server,'listening');const base='http://127.0.0.1:'+server.address().port,fixture=new DatabaseSync(path.join(dir,'agarm.sqlite'));let ws;
- const p={name:'Pass test',gold:500000,bonus:0,xp:1000,premiumUntil:0,inventory:[],claimed:[],wins:0,names:[],skins:[],following:[],bio:'',clanId:null,favorites:[],settings:{}};
+ const p={name:'Pass test',gold:5350000,bonus:0,xp:1000,premiumUntil:0,inventory:[],claimed:[],wins:0,names:[],skins:[],following:[],bio:'',clanId:null,favorites:[],settings:{}};
  const id=Number(fixture.prepare('INSERT INTO accounts(email,hash,salt,profile) VALUES(?,?,?,?)').run('pass@example.test','00'.repeat(64),'test-only',JSON.stringify(p)).lastInsertRowid),token=crypto.randomBytes(32).toString('hex');fixture.prepare('INSERT INTO sessions VALUES(?,?,?)').run(crypto.createHash('sha256').update(token).digest('hex'),id,Date.now()+60000);const cookie='agarm_session='+token;
  const call=async(data,auth=cookie)=>{const r=await fetch(base+'/api/action',{method:'POST',headers:{Origin:base,Cookie:auth,'content-type':'application/json'},body:JSON.stringify(data)});return {status:r.status,body:await r.json()}};
  try{

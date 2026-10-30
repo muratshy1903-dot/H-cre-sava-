@@ -1,7 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {seasonMeta,seasonState,SEASON_LENGTH,SEASON_ANCHOR,SEASON_QUESTS,rewardFor,claimReward,claimAllRewards,buyPass,claimSeasonQuest,equipCosmetic,cosmeticLook,levelForXP,PASS_PRICE} from '../dist/season.js';
 import {DAILY_QUESTS,claimDaily,progress,daily} from '../dist/progression.js';
-const t=SEASON_ANCHOR+86400000,profile=()=>({gold:1000000,bonus:0,xp:0,premiumUntil:0,inventory:[],claimed:[]});
+const t=SEASON_ANCHOR+86400000,profile=()=>({gold:10000000,bonus:0,xp:0,premiumUntil:0,inventory:[],claimed:[]});
 test('ZirvePass has 30 tiers, 3 extra milestones and exact published reward totals',()=>{
  assert.equal(levelForXP(0),0);assert.equal(levelForXP(199),0);assert.equal(levelForXP(200),1);assert.equal(levelForXP(6000),30);assert.equal(levelForXP(9000),30);
  for(const [lane,total]of [['free',160000],['paid',800000]])assert.equal(Array.from({length:33},(_,i)=>rewardFor(i+1,lane)?.amount||0).reduce((a,b)=>a+b,0),total);
