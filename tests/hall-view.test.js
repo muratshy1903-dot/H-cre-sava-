@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {hallHero} from '../dist/hall-view.js';
+const c={esc:v=>String(v).replaceAll('<','&lt;'),fmt:String,skinEmoji:s=>s==='skin7'?'🐯':''};
+test('hall champion uses highest completed score and winning skin; validates image path',()=>{const rooms=[{id:'FFA-1',highestScore:100,recordName:'A',recordSkin:'skin7'},{id:'FFA-2',highestScore:200,recordName:'B',recordSkin:'custom-'+'a'.repeat(24)}];const s=hallHero(rooms,c);assert.match(s,/200/);assert.match(s,/FFA-2/);assert.match(s,/skins\/aaaaaaaaaaaaaaaaaaaaaaaa.webp/);assert.doesNotMatch(hallHero([{...rooms[1],recordSkin:'https://unknown.test/x'}],c),/<img/);assert.match(hallHero([],c),/İlk şampiyon bekleniyor/);assert.match(hallHero([rooms[0]],c),/🐯/)});
