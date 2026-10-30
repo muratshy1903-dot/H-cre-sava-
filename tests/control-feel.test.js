@@ -11,7 +11,7 @@ test('normal Gold is spread evenly and keeps wallet, prize and mass caps correct
  const w=new World(),p=w.addPlayer('p',{gold:1000});p.cells=[w.cell(p,100),w.cell(p,100)];
  assert.equal(w.gold(p,'big'),true);assert.deepEqual(p.cells.map(c=>c.mass),[225,225]);assert.equal(p.gold,900);assert.equal(w.prize,50100);
  w.time+=50;assert.equal(w.gold(p,'big'),true);assert.deepEqual(p.cells.map(c=>c.mass),[350,350]);
- p.cells[0].mass=220080;p.cells[1].mass=100;w.time+=50;w.gold(p,'big');assert.equal(p.cells[0].mass,220084);assert.equal(p.cells[1].mass,346);
+ p.cells[0].mass=220080;p.cells[1].mass=100;w.time+=50;w.gold(p,'big');assert.equal(p.cells.length,3);assert.ok(Math.abs(p.cells.reduce((n,c)=>n+c.mass,0)-220430)<1e-6);assert.ok(p.cells.every(c=>c.mass<220000));assert.equal(p.gold,700);
 });
 test('overlapping fragments separate, then rejoin once the merge timer expires',()=>{
  const w=new World(),p=w.addPlayer('p');w.items=[];p.cells[0].mass=4000;w.burst(p,p.cells[0]);w.step(.05);

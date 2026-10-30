@@ -20,6 +20,6 @@ test('BOOST-1 has its own 10-minute clock, compact map, double Boost and existin
 test('admin mass grants update score without Gold, stay within cell and overall caps and reject dead players',()=>{
  const w=new World('FFA-1'),p=w.addPlayer('p',{gold:5000});const prize=w.prize;
  assert.equal(w.addMass(p,10000),10000);assert.equal(p.score,10100);assert.equal(p.gold,5000);assert.equal(w.prize,prize);
- assert.equal(w.addMass(p,5500000),220084-10100);assert.equal(p.score,220084);
+ assert.equal(w.addMass(p,5500000),5500000-10100);assert.equal(p.score,5500000);assert.equal(p.cells.length,25);assert.ok(p.cells.every(c=>c.mass<=220084));
  assert.equal(w.addMass(p,1),0);p.cells=[];assert.equal(w.addMass(p,1),0);
 });

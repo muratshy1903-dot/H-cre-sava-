@@ -1,0 +1,31 @@
+import http from 'node:http';
+import test from 'node:test';import assert from 'node:assert/strict';import {mkdtemp,rm,writeFile} from 'node:fs/promises';import os from 'node:os';import path from 'node:path';import crypto from 'node:crypto';import {once} from 'node:events';import {DatabaseSync} from 'node:sqlite';import WebSocket from 'ws';
+test('isolated reset requires owner password and session-bound nonce, makes a restorable backup, preserves owner login and erases test state',async()=>{
+ const dir=await mkdtemp(path.join(os.tmpdir(),'agarm-reset-test-only-')),password='reset-fixture-passphrase',salt=crypto.randomBytes(16).toString('hex');process.env.AGARM_DATA=dir;process.env.AGARM_OWNER_BOOTSTRAP=JSON.stringify({email:'reset-owner@example.test',salt,hash:crypto.scryptSync(password,salt,64).toString('hex')});
+ const {startServer,grantAdmin}=await import('../server/index.js'),server=startServer({port:0});await once(server,'listening');const base='http://127.0.0.1:'+server.address().port,fixture=new DatabaseSync(path.join(dir,'agarm.sqlite'));let ws;
+ const call=async(route,data,cookie,origin=base)=>{const r=await fetch(base+'/api/'+route,{method:data?'POST':'GET',headers:{Origin:origin,...(cookie?{Cookie:cookie}:{}),'content-type':'application/json'},body:data?JSON.stringify(data):undefined});return {status:r.status,body:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0]}};
+ try{
+  const owner=await call('login',{email:'reset-owner@example.test',password}),otherSession=await call('login',{email:'reset-owner@example.test',password}),player=await call('register',{email:'test-only-player@example.test',password:'test-only-passphrase',name:'Silinecek test oyuncusu'});assert.equal(owner.body.user.isOwner,true);assert.equal(player.body.user.isOwner,false);
+  grantAdmin('test-only-player@example.test');assert.equal((await call('me',null,player.cookie)).body.user.isAdmin,false);assert.equal((await call('management',null,player.cookie)).status,403);assert.equal((await call('management-reset/prepare',{password:'test-only-passphrase'},player.cookie)).status,403);
+  const manage=data=>call('management',data,owner.cookie);
+  assert.equal((await manage({action:'createRoom',room:'TEST-SILINECEK',mode:'ffa',minutes:10,basePrize:500000})).status,200);
+  await manage({action:'wallet',target:owner.body.user.id,wallet:'gold',amount:6000,reason:'Reset backup fixture'});
+  fixture.prepare('INSERT INTO records(account_id,room,name,score,at,replay) VALUES(?,?,?,?,?,?)').run(player.body.user.id,'TEST-SILINECEK','Test',123456,Date.now(),'[]');
+  ws=new WebSocket(base.replace('http:','ws:')+'/ws',{headers:{Origin:base,Cookie:player.cookie}});ws.on('error',()=>{});await once(ws,'open');const joined=new Promise(resolve=>ws.on('message',raw=>{if(JSON.parse(raw).type==='joined')resolve()}));ws.send(JSON.stringify({type:'join',room:'TEST-SILINECEK',name:'Test'}));await joined;
+  assert.equal((await call('management-reset/prepare',{password:'wrong'},owner.cookie)).status,401);
+  const prepared=await call('management-reset/prepare',{password},owner.cookie);assert.equal(prepared.status,200);assert.equal(prepared.body.summary.accounts,1);assert.equal(prepared.body.summary.records,1);assert.equal(prepared.body.summary.customRooms,1);
+  const data={nonce:prepared.body.nonce,confirmation:'SIFIRLA'};assert.equal((await call('management-reset/execute',data,otherSession.cookie)).status,400);assert.equal((await call('management-reset/execute',data,owner.cookie,'https://wrong-origin.example')).status,403);assert.equal(fixture.prepare('SELECT count(*) n FROM accounts').get().n,2);
+  let staleRequest;const staleResponse=new Promise((resolve,reject)=>{staleRequest=http.request(base+'/api/action',{method:'POST',headers:{Origin:base,Cookie:player.cookie,'content-type':'application/json'}},res=>{let body='';res.on('data',b=>body+=b);res.on('end',()=>resolve({status:res.statusCode,body}))});staleRequest.on('error',reject);staleRequest.write('{"action":"bio",');});
+  await new Promise(r=>setTimeout(r,20));
+  const closed=once(ws,'close'),result=await call('management-reset/execute',data,owner.cookie);staleRequest.end('"value":"old request after reset"}');assert.equal((await staleResponse).status,409);
+assert.equal(result.status,200);await closed;
+  assert.equal(fixture.prepare('SELECT count(*) n FROM accounts').get().n,1);assert.equal(fixture.prepare('SELECT count(*) n FROM records').get().n,0);assert.equal(fixture.prepare('SELECT count(*) n FROM room_controls').get().n,0);assert.equal(fixture.prepare('SELECT count(*) n FROM room_settings').get().n,0);
+  assert.equal((await call('rooms')).body.length,88);assert.equal((await call('health')).body.activeRooms,0);
+  const fresh=(await call('me',null,owner.cookie)).body.user;assert.equal(fresh.isOwner,true);assert.equal(fresh.gold,100000);assert.equal(fresh.bonus,50000);assert.equal(fresh.wins,0);assert.equal(fresh.season.xp,0);
+  assert.equal((await call('me',null,player.cookie)).body.user,null);assert.equal((await call('me',null,otherSession.cookie)).body.user,null);assert.equal((await call('login',{email:'reset-owner@example.test',password})).status,200);
+  assert.equal((await call('management-reset/execute',data,owner.cookie)).status,400);
+  const denied=await fetch(base+result.body.backupUrl);assert.equal(denied.status,403);
+  const download=await fetch(base+result.body.backupUrl,{headers:{Cookie:owner.cookie}});assert.equal(download.status,200);const bytes=Buffer.from(await download.arrayBuffer());assert.equal(bytes.subarray(0,15).toString(),'SQLite format 3');const file=path.join(dir,'downloaded-backup.sqlite');await writeFile(file,bytes);const old=new DatabaseSync(file,{readOnly:true});assert.equal(old.prepare('SELECT count(*) n FROM accounts').get().n,2);assert.equal(old.prepare('SELECT count(*) n FROM records').get().n,1);assert.equal(JSON.parse(old.prepare('SELECT profile FROM accounts WHERE id=?').get(owner.body.user.id).profile).gold,106000);old.close();
+  assert.equal(fixture.prepare("SELECT count(*) n FROM audit WHERE action='gameReset'").get().n,1);
+ }finally{ws?.terminate();await new Promise(r=>server.shutdown(r));fixture.close();delete process.env.AGARM_OWNER_BOOTSTRAP;await rm(dir,{recursive:true,force:true})}
+});

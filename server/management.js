@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-export function createManagement({db,account,save,atomic,budget,fail,json,sha,worlds,worldFor,connections,rooms,roomTiming,clients}){
+export function createManagement({db,account,save,atomic,budget,fail,json,sha,worlds,worldFor,connections,rooms,roomTiming,clients,canManage=p=>p?.role==='admin',isOwner=p=>p?.role==='admin'}){
  db.exec(`CREATE TABLE IF NOT EXISTS room_pools(room TEXT PRIMARY KEY,round_end INTEGER NOT NULL,prize INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS room_settings(room TEXT PRIMARY KEY,base_prize INTEGER NOT NULL DEFAULT 50000,closed INTEGER NOT NULL DEFAULT 0);
  CREATE TABLE IF NOT EXISTS management_settings(key TEXT PRIMARY KEY,value TEXT);
@@ -27,10 +27,10 @@ export function createManagement({db,account,save,atomic,budget,fail,json,sha,wo
    json(res,200,{ok:true});return true;
   }
   if(url.pathname!=='/api/management')return false;
-  if(p?.role!=='admin')fail('Yönetici yetkisi gerekli',403);
+  if(!canManage(p))fail('Yönetici yetkisi gerekli',403);
   if(req.method==='GET'){
    const users=db.prepare('SELECT id FROM accounts ORDER BY id DESC LIMIT 200').all().map(r=>account(r.id)),live=livePlayers();
-   json(res,200,{stats:{accounts:db.prepare('SELECT count(*) n FROM accounts').get().n,online:live.length,activePlayers:live.filter(p=>p.alive&&!p.spectator).length,spectators:live.filter(p=>p.spectator).length,guests:live.filter(p=>!p.accountId).length,activeRooms:new Set(live.map(p=>p.room)).size},livePlayers:live,serverNow:Date.now(),rooms:roomList(),users:users.map(a=>({id:a.id,name:a.name,gold:a.gold,bonus:a.bonus,premiumUntil:a.premiumUntil,bannedUntil:a.bannedUntil||0,mutedUntil:a.mutedUntil||0,role:a.role||'player'})),reports:db.prepare('SELECT * FROM reports ORDER BY id DESC LIMIT 100').all()});return true;
+   json(res,200,{stats:{accounts:db.prepare('SELECT count(*) n FROM accounts').get().n,online:live.length,activePlayers:live.filter(p=>p.alive&&!p.spectator).length,spectators:live.filter(p=>p.spectator).length,guests:live.filter(p=>!p.accountId).length,activeRooms:new Set(live.map(p=>p.room)).size},livePlayers:live,canReset:isOwner(p),serverNow:Date.now(),rooms:roomList(),users:users.map(a=>({id:a.id,name:a.name,gold:a.gold,bonus:a.bonus,premiumUntil:a.premiumUntil,bannedUntil:a.bannedUntil||0,mutedUntil:a.mutedUntil||0,role:a.role||'player'})),reports:db.prepare('SELECT * FROM reports ORDER BY id DESC LIMIT 100').all()});return true;
   }
   if(req.method!=='POST')fail('Yöntem desteklenmiyor',405);
   budget(req,'management',40);const action=String(data.action||''),reason=String(data.reason||'').trim().slice(0,200);let result={ok:true};
@@ -65,7 +65,7 @@ export function createManagement({db,account,save,atomic,budget,fail,json,sha,wo
    const peer=connections.get(Number(data.target)),w=peer?.world,player=w?.players.get(peer.pid),amount=Number(data.amount);
    if(!player||player.spectator||!player.cells.length)fail('Oyuncu hesabıyla bir odada canlı olmalı');
    if(!Number.isSafeInteger(amount)||amount<1||amount>5500000||!reason)fail('1-5.500.000 arasında skor ve işlem nedeni gerekli');
-   const capacity=Math.max(0,Math.min(5500000-Math.ceil(player.cells.reduce((sum,c)=>sum+c.mass,0)),player.cells.reduce((sum,c)=>sum+Math.max(0,220084-c.mass),0))),added=Math.min(capacity,amount);
+   const capacity=w.growthCapacity(player),added=Math.min(capacity,amount);
    if(added<=0)fail('Oyuncu kütle sınırında');
    atomic(()=>log(p,'score',Number(data.target),JSON.stringify({room:w.room,requested:amount,added,reason})),p,'admin:score');
    result={ok:true,added:w.addMass(player,amount)};
