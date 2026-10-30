@@ -6,7 +6,7 @@ import path from 'node:path';
 import {once} from 'node:events';
 import WebSocket from 'ws';
 import {ROOMS} from '../dist/engine.js';
-test('87 odanın tamamına WebSocket üzerinden katılınır; hesap olmadan bakiye işlemi yapılamaz',async()=>{
+test('88 odanın tamamına WebSocket üzerinden katılınır; hesap olmadan bakiye işlemi yapılamaz',async()=>{
  const dir=await mkdtemp(path.join(os.tmpdir(),'agarm-rooms-'));process.env.AGARM_DATA=dir;
  const {startServer}=await import('../server/index.js');const server=startServer({port:0});await once(server,'listening');
  const origin='http://127.0.0.1:'+server.address().port;

@@ -10,7 +10,7 @@ test('management requires one-use setup, rejects regular players and audits wall
   assert.equal((await call('admin-setup',{code},a.cookie)).status,200);
   assert.equal((await call('admin-setup',{code},b.cookie)).status,403);
   assert.equal((await call('management',null,b.cookie)).status,403);
-  const panel=await call('management',null,a.cookie);assert.equal(panel.status,200);assert.equal(panel.body.rooms.length,87);assert.ok(!JSON.stringify(panel.body).includes('example.test'));
+  const panel=await call('management',null,a.cookie);assert.equal(panel.status,200);assert.equal(panel.body.rooms.length,88);assert.ok(!JSON.stringify(panel.body).includes('example.test'));
   const manage=data=>call('management',data,a.cookie);
   const denied=await call('management',{action:'wallet',target:b.body.user.id,wallet:'gold',amount:999999,reason:'no authority'},b.cookie);assert.equal(denied.status,403);
   const balance=b.body.user.gold;
