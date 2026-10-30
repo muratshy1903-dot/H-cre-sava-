@@ -5,13 +5,17 @@ export function createManagement({db,account,save,atomic,budget,fail,json,sha,wo
  CREATE TABLE IF NOT EXISTS management_settings(key TEXT PRIMARY KEY,value TEXT);
  CREATE TABLE IF NOT EXISTS room_history(room TEXT PRIMARY KEY,winner_name TEXT,winner_score INTEGER,highest_score INTEGER NOT NULL DEFAULT 0,at INTEGER);
  CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT,reporter INTEGER,target INTEGER,text TEXT,at INTEGER,status TEXT DEFAULT 'Açık');`);
+ db.exec(`CREATE TABLE IF NOT EXISTS room_controls(room TEXT PRIMARY KEY,definition TEXT NOT NULL,boost TEXT NOT NULL DEFAULT '{}');`);
+ for(const row of db.prepare('SELECT * FROM room_controls').all()){const definition=JSON.parse(row.definition),existing=rooms.find(r=>r.id===row.room);if(existing)Object.assign(existing,definition);else rooms.push(definition);}
+ const boostConfig=id=>{const row=db.prepare('SELECT boost FROM room_controls WHERE room=?').get(id);return row?JSON.parse(row.boost):{gold:1,feedMs:90,splitMs:80,until:0}};
+ const persistControl=(definition,boost=boostConfig(definition.id))=>db.prepare('INSERT INTO room_controls(room,definition,boost) VALUES(?,?,?) ON CONFLICT(room) DO UPDATE SET definition=excluded.definition,boost=excluded.boost').run(definition.id,JSON.stringify(definition),JSON.stringify(boost));
  const log=(p,action,target,detail)=>db.prepare('INSERT INTO audit(actor,action,target,detail,at) VALUES(?,?,?,?,?)').run(p.id,action,target||0,detail||'',Date.now());
  const config=room=>db.prepare('SELECT * FROM room_settings WHERE room=?').get(room)||{room,base_prize:50000,closed:0};
  const setupAvailable=()=>!!process.env.AGARM_ADMIN_SETUP_HASH&&!db.prepare("SELECT value FROM management_settings WHERE key='admin_claimed'").get()&&!db.prepare("SELECT id FROM accounts WHERE json_extract(profile,'$.role')='admin' LIMIT 1").get();
  const pool=(room,end)=>{const row=db.prepare('SELECT prize FROM room_pools WHERE room=? AND round_end=?').get(room,end);return row?.prize};
  const persistPool=w=>db.prepare('INSERT INTO room_pools(room,round_end,prize) VALUES(?,?,?) ON CONFLICT(room) DO UPDATE SET round_end=excluded.round_end,prize=excluded.prize').run(w.room,w.roundEnd,Math.floor(w.prize));
- const roomList=()=>rooms.map(r=>{const timing=roomTiming(r.id),w=worlds.get(r.id),list=[...(w?.players.values()||[])].filter(p=>!p.bot),conf=config(r.id);return{...r,...timing,...conf,prize:w&&w.roundEnd===timing.endsAt?w.prize:pool(r.id,timing.endsAt)??conf.base_prize,players:list.filter(p=>!p.spectator&&p.cells.length).length,spectators:list.filter(p=>p.spectator).length,connections:list.length}});
- const livePlayers=()=>[...clients()].filter(ws=>ws.readyState===1&&ws.world).map(ws=>{const player=ws.world.players.get(ws.pid),a=ws.user;return{connection:ws.pid,accountId:a?.id||null,name:player?.name||a?.name||'Misafir',room:ws.world.room,score:Math.floor(player?.cells.reduce((sum,c)=>sum+c.mass,0)||0),max:player?.max||0,cells:player?.cells.length||0,gold:Math.floor(player?.gold||0),bonus:Math.floor(player?.bonus||0),spectator:!!player?.spectator,alive:!!player?.cells.length,team:player?.team||'',clanId:a?.clanId||null,premium:!!(a?.premiumUntil>Date.now()),role:a?.role||'player',lastPingAgoMs:Math.max(0,Date.now()-ws.lastPing)}});
+ const roomList=()=>rooms.map(r=>{const timing=roomTiming(r.id),w=worlds.get(r.id),list=[...(w?.players.values()||[])].filter(p=>!p.bot),conf=config(r.id);return{...r,...timing,...conf,boost:boostConfig(r.id),prize:w&&w.roundEnd===timing.endsAt?w.prize:pool(r.id,timing.endsAt)??conf.base_prize,players:list.filter(p=>!p.spectator&&p.cells.length).length,spectators:list.filter(p=>p.spectator).length,connections:list.length}});
+ const livePlayers=()=>[...clients()].filter(ws=>ws.readyState===1&&ws.world).map(ws=>{const player=ws.world.players.get(ws.pid),a=ws.user;return{connection:ws.pid,accountId:a?.id||null,name:player?.name||a?.name||'Misafir',room:ws.world.room,score:Math.floor(player?.cells.reduce((sum,c)=>sum+c.mass,0)||0),max:player?.max||0,cells:player?.cells.length||0,gold:Math.floor(player?.gold||0),bonus:Math.floor(player?.bonus||0),spectator:!!player?.spectator,alive:!!player?.cells.length,team:player?.team||'',clanId:a?.clanId||null,premium:!!(a?.premiumUntil>Date.now()),role:a?.role||'player',mutedUntil:a?.mutedUntil||0,lastPingAgoMs:Math.max(0,Date.now()-ws.lastPing)}});
 
  async function route(req,res,url,p,data){
   if(url.pathname==='/api/management-status'){json(res,200,{setupAvailable:setupAvailable()});return true;}
@@ -30,7 +34,16 @@ export function createManagement({db,account,save,atomic,budget,fail,json,sha,wo
   }
   if(req.method!=='POST')fail('Yöntem desteklenmiyor',405);
   budget(req,'management',40);const action=String(data.action||''),reason=String(data.reason||'').trim().slice(0,200);let result={ok:true};
-  if(['wallet','premium','mute'].includes(action)){
+  if(action==='createRoom'){
+   const id=String(data.room||'').trim(),minutes=Number(data.minutes),base=Number(data.basePrize);if(!/^[\p{L}\p{N}][\p{L}\p{N} _-]{0,23}$/u.test(id)||rooms.some(r=>r.id.toLocaleLowerCase('tr')===id.toLocaleLowerCase('tr')))fail('Oda adı geçersiz veya zaten kullanılıyor');if(rooms.length>=250)fail('En fazla 250 oda açılabilir');if(!Number.isInteger(minutes)||minutes<1||minutes>1440||!Number.isSafeInteger(base)||base<0||base>100000000)fail('Süre 1-1440 dakika, ödül 0-100.000.000 olmalı');if(!['ffa','nogold','special','boost'].includes(data.mode))fail('Oda türü geçersiz');const definition={id,mode:data.mode,minutes,durationMs:minutes*60000,scheduleEnd:Date.now()+minutes*60000,custom:true};
+   atomic(()=>{persistControl(definition);db.prepare('INSERT INTO room_settings(room,base_prize,closed) VALUES(?,?,0)').run(id,base);log(p,action,0,JSON.stringify(definition));},p,'admin:createRoom');rooms.push(definition);result={ok:true,room:id};
+  }else if(action==='addTime'){
+   const id=String(data.room||''),minutes=Number(data.minutes),definition=rooms.find(r=>r.id===id);if(!definition||!Number.isInteger(minutes)||minutes<1||minutes>1440)fail('Oda ve 1-1440 dakika ek süre gerekli');const w=worldFor(id),oldEnd=w.roundEnd,end=oldEnd+minutes*60000;if(end-Date.now()>7*86400000)fail('Kalan süre en fazla 7 gün olabilir');const next={...definition,scheduleEnd:end};
+   atomic(()=>{persistControl(next);db.prepare('UPDATE room_pools SET round_end=? WHERE room=? AND round_end=?').run(end,id,oldEnd);log(p,action,0,JSON.stringify({room:id,minutes,end}));},p,'admin:addTime');Object.assign(definition,next);w.roundEnd=end;persistPool(w);result={ok:true,endsAt:end};
+  }else if(action==='roomBoost'){
+   const id=String(data.room||''),definition=rooms.find(r=>r.id===id),gold=Number(data.goldRate),feedMs=Number(data.feedMs),splitMs=Number(data.splitMs),minutes=Number(data.minutes);if(!definition||!Number.isInteger(gold)||gold<1||gold>50||![feedMs,splitMs].every(n=>Number.isInteger(n)&&n>=50&&n<=1000)||!Number.isInteger(minutes)||minutes<0||minutes>10080)fail('Gold çarpanı 1-50, yem/bölünme aralığı 50-1000 ms, süre 0-10080 dakika olmalı');if(definition.mode==='nogold'&&gold>1)fail('Goldsuz odada Gold Boost açılamaz');const boost={gold,feedMs,splitMs,until:minutes?Date.now()+minutes*60000:0};
+   atomic(()=>{persistControl(definition,boost);log(p,action,0,JSON.stringify({room:id,...boost}));},p,'admin:roomBoost');const w=worlds.get(id);if(w)w.boost=boost;result={ok:true,boost};
+  }else if(['wallet','premium','mute'].includes(action)){
    const a=account(Number(data.target));if(!a)fail('Hesap bulunamadı',404);
    atomic(()=>{
     account(a.id);
@@ -59,7 +72,7 @@ export function createManagement({db,account,save,atomic,budget,fail,json,sha,wo
   }else if(action==='room'){
    const id=String(data.room||'');if(!rooms.some(r=>r.id===id))fail('Oda bulunamadı');const base=Number(data.basePrize),extra=Number(data.extraPrize||0);if(!Number.isSafeInteger(base)||base<0||base>100000000||!Number.isSafeInteger(extra)||extra<0||extra>100000000)fail('Ödül 0-100.000.000 arasında olmalı');const w=worlds.get(id);const old=config(id);if(w&&w.prize+extra>1000000000)fail('Oda ödül sınırı');
    atomic(()=>{db.prepare('INSERT INTO room_settings(room,base_prize,closed) VALUES(?,?,?) ON CONFLICT(room) DO UPDATE SET base_prize=excluded.base_prize,closed=excluded.closed').run(id,base,data.closed===true?1:0);log(p,'room',0,JSON.stringify({room:id,base,extra,closed:data.closed===true}));},p,'admin:room');
-   if(w){w.basePrize=base;w.prize=Math.max(0,w.prize+base-old.base_prize+extra);persistPool(w);}else if(extra){const w=worldFor(id);w.prize+=extra;persistPool(w);}
+   if(w){w.basePrize=base;w.prize=Math.max(0,w.prize+extra);persistPool(w);}else if(extra){const w=worldFor(id);w.prize+=extra;persistPool(w);}
   }else if(action==='finishRoom'){
    const id=String(data.room||'');if(!rooms.some(r=>r.id===id))fail('Oda bulunamadı');const w=worldFor(id);w.finishRequested=[...w.players.values()].some(a=>!a.bot&&a.cells.length);if(!w.finishRequested){w.prize=w.basePrize;const t=roomTiming(id);w.roundStart=t.startsAt;w.roundEnd=t.endsAt;}log(p,action,0,id);
   }else if(action==='announce'){
@@ -71,5 +84,5 @@ export function createManagement({db,account,save,atomic,budget,fail,json,sha,wo
   }else fail('İşlem bulunamadı',404);
   json(res,200,result);return true;
  }
- return {route,config,roomList,pool,persistPool};
+ return {route,config,roomList,pool,persistPool,boostConfig};
 }
