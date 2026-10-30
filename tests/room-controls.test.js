@@ -44,6 +44,7 @@ test('custom rooms, time, rewards and Boost persist across restart; mute blocks 
   await manage({action:'reward',room:'TEST-ODA',amount:5000,reason:'Test'});
   assert.equal((await manage({action:'addTime',room:'TEST-ODA',minutes:10})).status,200);
   assert.equal((await manage({action:'addTime',room:'TEST-ODA',minutes:-1})).status,400);
+  assert.equal((await call(base,'management',{action:'roomBoost',room:'TEST-ODA',goldRate:50,feedMs:50,splitMs:50,minutes:60},player.cookie)).status,403);
   assert.equal((await manage({action:'roomBoost',room:'TEST-ODA',goldRate:7,feedMs:50,splitMs:50,minutes:60})).status,200);
   assert.equal((await manage({action:'roomBoost',room:'TEST-ODA',goldRate:Infinity,feedMs:50,splitMs:50,minutes:60})).status,400);
   const snap=await next(ws,'state');assert.equal(snap.boost.gold,7);assert.equal(snap.prize,85000);assert.equal(snap.self.cells,1);assert.ok(snap.timeLeft>1700);
