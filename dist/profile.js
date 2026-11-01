@@ -1,0 +1,24 @@
+import {victoriesView} from './victories.js';
+export async function profilePage(c){
+ const {S,api,esc,fmt,form,input,modeNotice,skinGrid,uploadPanel,featurePage,getList}=c,p=S.profile;
+ const [wins,market,rooms,messages]=await Promise.all([S.online?api('victories/'+p.id):[],S.online?api('market'):{ownRecords:[]},S.online?api('rooms'):[],getList('inbox')]);
+ const records=(market.ownRecords||[]).filter(r=>rooms.some(room=>room.id===r.room&&room.highestScore===r.score));
+ const panel=(id,title,body)=>`<section class="profile-inline" id="${id}" hidden><h3>${title}</h3>${body}<button type="button" data-profile-panel="${id}">Kapat</button></section>`;
+ const link=(id,text)=>`<button type="button" class="profile-link" data-profile-panel="${id}">${text}</button>`;
+ return `${modeNotice()}<div class="profile-reference"><div class="profile-pin">${form('redeem',input('Pin','value','text','','required aria-label="Pin"'),'Premium veya Gold Pin Kodunu Gir')}</div><div class="profile-clan">${p.clanId?'Klan #'+p.clanId:esc(p.name)}<small>Hesap No: ${p.id}</small></div><div class="profile-social">${link('profile-following',(p.following?.length||0)+' Takip ediliyor')}<br>${link('profile-messages','Yeni Mesajlar')}<br>${link('profile-messages','Eski Mesajlar')}</div>
+ ${panel('profile-following','Takip edilenler',`<p>${(p.following||[]).map(id=>'<button data-player="'+id+'">Hesap #'+id+'</button>').join(' · ')||'Henüz takip ettiğin oyuncu yok.'}</p>`+form('follow',input('Hesap no','target','number','','required min="1"'),'Takip et'))}
+ ${panel('profile-messages','Mesajlar',messages.map(m=>`<p>#${m.sender} → #${m.recipient}: ${esc(m.text)}</p>`).join('')+form('message',input('Alıcı hesap no','target','number','','required min="1"')+'<label>Mesaj<textarea name="value" required maxlength="500"></textarea></label>','Gönder'))}
+ <div class="profile-records">${records.map(r=>`<section class="reference-trophy"><div class="reference-cup">🏆</div><h2>${esc(r.room)} rekortmen</h2><div>${esc(r.name)}</div><strong>${fmt(r.score)}</strong><button data-page="market">Rekor alım satımı</button></section>`).join('')}</div>
+ <div class="profile-tools">${link('profile-edit','Kullanıcı Düzenle')} &nbsp; | &nbsp; ${link('profile-clan-info','Klan')} &nbsp; | &nbsp; ${link('profile-security','Hesap İşlemleri')}</div>
+ ${panel('profile-clan-info','Klan',p.clanId?'<p>Klan #'+p.clanId+'</p><button data-page="clans">Klanı aç</button>':'<p>Henüz bir klana katılmadın.</p><button data-page="clans">Klanlar</button>')}
+ <div class="reference-wallet"><div><span>Gold: <b>${fmt(p.gold)}</b></span><button data-act="premium">Bir Günlük Premium Satın Al (22.000 Gold)</button></div><div><span>Bonus: <b>${fmt(p.bonus)}</b></span><button data-act="collectBonus">Bonus goldlarını topla</button> ${link('profile-transfer','Bonus transferleri')} | <button class="profile-link" data-page="shop">Gold Satın Al</button></div></div>
+ <div class="reference-skin-links">${link('profile-upload','Skin Yükle')} &nbsp;|&nbsp; ${link('profile-skins','Kayıtlı Skinler ('+p.skins.length+')')}</div>
+ ${panel('profile-upload','Skin Yükle',await uploadPanel(c))}${panel('profile-skins','Kayıtlı Skinler',p.skins.length?skinGrid(p.skins):'<p>Henüz kayıtlı skin yok.</p><button data-page="skins">Skin Galerisi</button>')}
+ <p class="profile-bio">${esc(p.bio)}</p><button class="reference-edit" data-profile-panel="profile-edit" aria-label="Açıklamayı düzenle">✎</button>
+ ${panel('profile-edit','Profilini düzenle',form('name',input('Görünen isim','value','text',p.name,'required maxlength="24"'),'İsmi güncelle')+form('bio',`<label>Açıklama<textarea name="value" maxlength="500">${esc(p.bio)}</textarea></label>`,'Açıklamayı kaydet'))}
+ <section class="reference-names"><h3>Kayıtlı İsimler</h3>${p.names.map(n=>`<div><span>${esc(n)}</span><button data-act="deleteName" data-value="${esc(n)}">Sil</button><button data-act="favorite" data-value="${esc(n)}">${p.favorites.includes(n)?'★ Favori':'Favorilere Ekle'}</button></div>`).join('')||'<p>Kayıtlı ismin yok.</p>'}</section><div class="reference-buy-name">${link('profile-buy-name','İsim Satın Al (2.000 Gold)')}</div>${panel('profile-buy-name','Yeni isim',form('buyName',input('İsim','value','text','','required maxlength="24"'),'İsim Satın Al (2.000 Gold)'))}
+ ${victoriesView(wins,{esc,fmt})}
+ ${panel('profile-transfer','Bonus transferleri',form('transfer',input('Alıcı hesap no','target','number','','required min="1"')+input('Bonus miktarı','amount','number','500','required min="500"'),'Bonus gönder'))}
+ ${panel('profile-security','Hesap güvenliği',await featurePage('security',{},c))}
+ <footer class="reference-profile-end">___Oyuncu Sayfasının Sonu___</footer></div>`;
+}
