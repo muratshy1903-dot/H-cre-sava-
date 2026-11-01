@@ -1,0 +1,3 @@
+export const REPLAY_WINDOW_MS=300000;
+export function captureReplay(w,frame,now=frame.serverTime){const clean={...frame,events:[]};w.replay??=[];w.replay.push(clean);const cutoff=now-REPLAY_WINDOW_MS;while(w.replay.length>1&&w.replay[0].serverTime<cutoff)w.replay.shift();if(w.replay.length>302)w.replay.splice(0,w.replay.length-302);return w.replay}
+export function winnerReplay(frames,pid){return frames.map(frame=>{const player=frame.players.find(p=>p.id===pid),cells=player?.cells||[],score=Math.floor(cells.reduce((n,c)=>n+c.mass,0));return {...frame,self:{id:pid,score,max:score,cells:cells.length,gold:frame.self?.gold||0,bonus:frame.self?.bonus||0},following:player?{id:pid,name:player.name}:null,events:[]}})}
