@@ -10,3 +10,57 @@ body.gm-page{background:#0b0f18;color:#e3e6ef}.gm-page #modal{position:static;di
 @media(max-width:900px){#lobby .lobby-grid #left-column{display:block}#lobby .lobby-grid #right-column{display:block}#lobby .lobby-grid #navigation a{font-size:13px}#lobby .play-column{max-width:calc(100% - 16px);margin:10px 8px}#lobby .reference-name-room{gap:6px}}
 /* Theme toggles apply immediately to the menu and game overlay. */
 body.light-mode:not(.utility-page){background:#eff7fb}body.light-mode #lobby{background:linear-gradient(#5682a00c 1px,transparent 1px),linear-gradient(90deg,#5682a00c 1px,transparent 1px),#eff7fbef;background-size:30px 30px}body.light-mode .hud-left,body.light-mode .hud-board,body.light-mode .hud-stats{color:#26394b;text-shadow:none}body.light-mode .hud-left small,body.light-mode .hud-board>span{color:#506579}body.light-mode .hud-left>strong{color:#8c7800}body.light-mode #chat-messages{color:#263a4a;text-shadow:none}body.light-mode #chat-form{background:#ffffffd9;border-color:#a0b8c9}body.light-mode #chat-input{color:#172f43}body.light-mode .menu-game{background:#fff;color:#314d63;border-color:#a6bac9}.chat-channel-tabs{display:flex;gap:3px;padding:4px;background:#0f1b2add;border:1px solid #4e6c8a55;border-radius:5px 5px 0 0}.chat-channel-tabs button{flex:1;background:transparent;color:#9db3ca;border-radius:3px;padding:7px 4px;font-size:12px}.chat-channel-tabs button.active{color:#fff;background:#337fb5}.chat-channel-tabs button[data-chat-channel="shout"].active{background:#ae761f}.chat-channel-tabs button[data-chat-channel="clan"].active{background:#278149}.chat-channel-tabs button[data-chat-channel="team"].active{background:#786123}.light-mode .chat-channel-tabs{background:#f8fcff;border-color:#adc5d7}.light-mode .chat-channel-tabs button:not(.active){color:#405b70}.pass-coming-soon{text-align:center;padding:65px 20px;min-height:330px;background:radial-gradient(ellipse at center,#512b7d55,transparent 65%),#101528;color:#dfe9ff;border-radius:12px}.pass-coming-soon>span{font-size:64px;color:#ea7aff}.pass-coming-soon h2{font-size:36px!important;color:white!important}.pass-coming-soon>strong{display:block;font-size:24px;color:#eab8ff;margin:15px}.pass-coming-soon>p{color:#a4b4d2}.pass-closed .neon-cell{opacity:.4}.pass-closed>strong{font-size:27px}.pass-closed .poster-bottom{font-size:9px}.play-button:disabled,.secondary-actions button:disabled{cursor:not-allowed;filter:grayscale(.7);opacity:.5}
+/* Responsive menu: each column owns its width and grows in normal document flow. */
+#lobby{min-height:100dvh;height:auto;padding:22px 16px;justify-content:flex-start;overflow:visible}
+#lobby .lobby-grid{display:grid;grid-template-columns:minmax(180px,240px) minmax(300px,370px) minmax(220px,330px);width:min(100%,1000px);max-width:100%;gap:22px;margin:20px auto!important;align-items:start}
+#lobby .lobby-grid>*,#lobby .play-card{min-width:0;max-width:100%}
+#lobby .play-column{width:auto;margin:8px 0;padding:12px 16px 18px;clip-path:none}
+#lobby #left-column,#lobby #right-column{position:static;width:auto;padding-top:30px}
+#lobby .account-paper{margin-top:16px}
+#lobby .reference-name-room{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+#lobby .name-line input,#lobby .room-line select{width:100%;min-width:0}
+#lobby .settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 8px;margin:14px 0}
+#lobby .settings label{white-space:normal;line-height:1.3;min-width:0;font-size:11px}
+@media(max-width:960px){#lobby .lobby-grid{grid-template-columns:210px minmax(280px,370px);justify-content:center;width:100%}#lobby #right-column{grid-column:1/-1;display:block;padding-top:0}#lobby #right-column .season-poster{max-width:380px;margin:0 auto 12px}}
+@media(max-width:650px){#lobby{padding:14px 12px}#lobby .lobby-grid{display:flex;flex-direction:column;gap:14px;max-width:400px;margin:0 auto!important}#lobby .play-column{order:0;width:calc(100% - 16px);margin:8px;max-width:none}#lobby #left-column,#lobby #right-column{position:static;order:1;display:block;width:100%;padding:0}#lobby #right-column{order:2}#lobby #navigation{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px}#lobby #navigation a{line-height:1.35;overflow-wrap:anywhere}#lobby .logo-wrap{height:92px}}
+/* Full-height independent GM scrolling, including short landscape screens. */
+body.gm-page{height:100dvh;overflow:hidden!important}
+.gm-page #modal{position:fixed;inset:0;height:100dvh;overflow:hidden}
+.gm-page .modal-sheet{height:100%;min-height:0;max-height:100%;overflow:hidden}
+.gm-page #modal-content{height:100%;min-height:0;overflow:hidden}
+.gm-shell{display:flex;height:100%;min-height:0;overflow:hidden}
+.gm-sidebar{position:static;width:245px;flex:0 0 245px;min-height:0}
+.gm-sidebar nav{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.gm-brand,.gm-sidebar footer{flex-shrink:0}
+.gm-main{margin-left:0;min-width:0;min-height:0;flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable;scrollbar-width:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.gm-content{padding-bottom:60px}.gm-heading{height:auto;min-height:88px;flex-shrink:0}
+@media(max-width:900px){.gm-sidebar{width:185px;flex-basis:185px}}
+@media(max-width:540px){.gm-shell{flex-direction:column;padding:0}.gm-sidebar{width:100%;flex:0 0 auto;max-height:150px}.gm-brand{height:58px}.gm-sidebar nav{flex:none;overflow-x:auto;overflow-y:hidden}.gm-main{margin:0;width:100%}}
+/* Classic game chat: transparent messages above a compact input/channel strip. */
+#chat-toggle,#chat-close{display:none}
+#chat{width:min(720px,65vw);left:9px;bottom:9px;z-index:8}
+#chat-panel{display:flex;flex-direction:column;min-width:0}
+#chat-messages{order:0;color:#fff;font-size:16px;line-height:1.25;max-height:min(30vh,260px);overflow-y:auto;overflow-wrap:anywhere;text-shadow:0 1px 2px #000;pointer-events:auto}
+#chat-form{order:1;min-height:32px;border:0;background:#22293670;border-radius:0}
+#chat-input{font-size:13px;padding:7px 8px}
+.chat-channel-tabs{order:2;justify-content:flex-start;gap:15px;padding:5px 2px;background:transparent!important;border:0;border-radius:0}
+.chat-channel-tabs button{flex:0 1 auto;display:flex;align-items:center;gap:5px;padding:3px 0;background:transparent!important;font-size:12px;color:#d6deea}
+.chat-channel-tabs button::before{content:'';width:11px;height:11px;border:1px solid currentColor;border-radius:2px}
+.chat-channel-tabs button.active{color:#fff;font-weight:bold}.chat-channel-tabs button.active::before{background:#3689c5;box-shadow:inset 0 0 0 2px #142337}
+.chat-channel-tabs button[data-chat-channel='clan'].active{color:#51e57d}.chat-channel-tabs button[data-chat-channel='team'].active{color:#fff064}.chat-channel-tabs button[data-chat-channel='shout'].active{color:#ffbb60}
+body.light-mode #chat-messages{color:#182c3a;text-shadow:0 1px 1px #fff}.light-mode .chat-channel-tabs button{color:#253f53}.light-mode .chat-channel-tabs button.active{color:#146ba4}
+@media(pointer:fine) and (hover:hover){#menu-button{display:none!important}}
+@media(pointer:coarse),(max-width:650px){
+ #chat{left:10px;bottom:max(12px,env(safe-area-inset-bottom));width:42px;height:42px}
+ #chat-toggle{display:grid;place-items:center;width:42px;height:42px;border:1px solid #9fb4cb80;border-radius:50%;background:#192b43e8;color:#fff;font-size:21px;box-shadow:0 2px 8px #0005}
+ #chat:not(.chat-open) #chat-panel{display:none}
+ #chat.chat-open{width:min(360px,calc(100vw - 20px));height:auto;bottom:max(12px,env(safe-area-inset-bottom))}
+ #chat.chat-open #chat-toggle{display:none}
+ #chat.chat-open #chat-panel{position:relative;padding:26px 8px 8px;border:1px solid #718aa2;background:#152437f2;border-radius:8px;box-shadow:0 6px 25px #0007}
+ #chat-close{display:block;position:absolute;right:2px;top:0;width:30px;height:28px;background:transparent;color:#fff;font-size:23px}
+ #chat-messages{height:min(25dvh,180px);max-height:min(25dvh,180px);max-width:100%;font-size:12px}
+ #chat-input{font-size:16px;min-height:38px}.chat-channel-tabs{gap:16px;flex-wrap:wrap}.chat-channel-tabs button{font-size:12px;min-height:30px}
+ body.light-mode #chat.chat-open #chat-panel{background:#f0f7fff5}body.light-mode #chat-close{color:#183950}
+ #gold-hud,#prize-hud{position:static;margin-top:8px}.hud-stats{bottom:175px}
+}
+@media(pointer:coarse),(max-width:650px){#chat:not(.chat-open){bottom:174px}#chat.chat-open{z-index:12}}
