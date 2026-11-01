@@ -15,7 +15,7 @@ export class MotionSmoother {
       return next;
     };
     this.cells=reconcile(snapshot.players.flatMap(p=>p.cells),this.cells);
-    this.items=reconcile(snapshot.items.filter(v=>v.type==='eject'),this.items);
+    this.items=reconcile(snapshot.items.filter(v=>v.type==='eject'||v.type==='virus'),this.items);
     this.frame={...snapshot,players:snapshot.players.map(p=>({...p,cells:p.cells.map(c=>this.cells.get(c.id).value)})),items:snapshot.items.map(v=>this.items.get(v.id)?.value||v)};
     this.at=now;
   }

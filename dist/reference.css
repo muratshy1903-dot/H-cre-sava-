@@ -64,3 +64,17 @@ body.light-mode #chat-messages{color:#182c3a;text-shadow:0 1px 1px #fff}.light-m
  #gold-hud,#prize-hud{position:static;margin-top:8px}.hud-stats{bottom:175px}
 }
 @media(pointer:coarse),(max-width:650px){#chat:not(.chat-open){bottom:174px}#chat.chat-open{z-index:12}}
+/* Audience colours apply to complete messages, including player names. */
+#chat-messages .chat-message{color:#ffffff}
+#chat-messages .chat-shout,#chat-messages .chat-shout strong{color:#459cff}
+#chat-messages .chat-clan,#chat-messages .chat-clan strong{color:#69dfcc}
+#chat-messages .chat-team,#chat-messages .chat-team strong{color:#ffeb3b}
+#chat-messages .chat-room strong{color:inherit}
+#chat-messages .chat-message{text-shadow:0 1px 2px #000,0 0 2px #000;background:#10182070;width:fit-content;max-width:100%}
+.hud-board #leaders li,.hud-board #leaders button{color:inherit}
+.hud-board #leaders button{padding:0;background:transparent;text-shadow:inherit;font:inherit}
+.chat-channel-tabs button[data-chat-channel='shout'].active{color:#459cff!important}
+.chat-channel-tabs button[data-chat-channel='clan'].active{color:#69dfcc!important}
+.chat-channel-tabs button[data-chat-channel='team'].active{color:#ffeb3b!important}
+#gold-expense{font-weight:bold;font-size:20px;color:#ff5959;text-shadow:0 1px 3px #000;line-height:1.3}
+@media(max-width:650px){#gold-expense{font-size:14px}}

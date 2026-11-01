@@ -9,4 +9,4 @@ export function drawCosmeticBorder(ctx,c,r,look,scale,now){
 export function drawCosmeticEntry(ctx,c,r,look,scale,age){
  if(!look?.entry||!Number.isFinite(age)||age<0||age>2200)return;const t=age/2200;ctx.save();ctx.strokeStyle=safeColor(look.entry.color);ctx.globalAlpha=(1-t)*.7;ctx.lineWidth=3/scale;ctx.beginPath();ctx.arc(c.x,c.y,r+20/scale+t*160/scale,0,Math.PI*2);ctx.stroke();ctx.fillStyle=safeColor(look.entry.color);for(let i=0;i<12;i++){const a=i/12*Math.PI*2+t*1.5,rr=r+(25+t*120)/scale;ctx.beginPath();ctx.arc(c.x+Math.cos(a)*rr,c.y+Math.sin(a)*rr,(3*(1-t)+1)/scale,0,Math.PI*2);ctx.fill()}ctx.restore();
 }
-export function drawCosmeticName(ctx,text,x,y,look,fast){ctx.save();if(look?.nick&&!fast){ctx.fillStyle=safeColor(look.nick.color);ctx.shadowColor=safeColor(look.nick.color);ctx.shadowBlur=9}ctx.fillText(text,x,y);ctx.restore()}
+export function drawCosmeticName(ctx,text,x,y,look,fast,identityColor){ctx.save();if(identityColor){ctx.fillStyle=identityColor}else if(look?.nick&&!fast){ctx.fillStyle=safeColor(look.nick.color);ctx.shadowColor=safeColor(look.nick.color);ctx.shadowBlur=9}ctx.fillText(text,x,y);ctx.restore()}
