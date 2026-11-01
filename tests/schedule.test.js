@@ -2,11 +2,11 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {World,ROOMS,roomTiming,ROOM_CYCLE_MS} from '../dist/engine.js';
 test('87 room clocks advance without players and preserve ordered stagger across restart',()=>{
  const hour=Date.UTC(2026,9,29,10),at=hour+1;
- const ends=ROOMS.filter(r=>r.mode!=='boost').map(r=>roomTiming(r.id,at).endsAt);
+ const ends=ROOMS.filter(r=>r.mode!=='boost').map(r=>roomTiming(r.id,at).endsAt).sort((a,b)=>a-b);
  assert.equal(new Set(ends).size,87);
  for(let i=1;i<87;i++){
   // FFA-1 is the next hourly boundary; other rooms in the current hour finish first.
-  if(i>1)assert.ok(ends[i]>ends[i-1]);
+  assert.ok(ends[i]>ends[i-1]);
  }
  const firstEnd=roomTiming('FFA-1',hour-1).endsAt;
  assert.equal(firstEnd,hour);
