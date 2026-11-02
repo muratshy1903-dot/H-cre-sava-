@@ -20,7 +20,7 @@ test('isolated reset requires owner password and session-bound nonce, makes a re
   const closed=once(ws,'close'),result=await call('management-reset/execute',data,owner.cookie);staleRequest.end('"value":"old request after reset"}');assert.equal((await staleResponse).status,409);
 assert.equal(result.status,200);await closed;
   assert.equal(fixture.prepare('SELECT count(*) n FROM accounts').get().n,1);assert.equal(fixture.prepare('SELECT count(*) n FROM records').get().n,0);assert.equal(fixture.prepare('SELECT count(*) n FROM room_controls').get().n,0);assert.equal(fixture.prepare('SELECT count(*) n FROM room_settings').get().n,0);
-  assert.equal((await call('rooms')).body.length,88);assert.equal((await call('health')).body.activeRooms,0);
+  assert.equal((await call('rooms')).body.length,90);assert.equal((await call('health')).body.activeRooms,0);
   const fresh=(await call('me',null,owner.cookie)).body.user;assert.equal(fresh.isOwner,true);assert.equal(fresh.gold,100000);assert.equal(fresh.bonus,50000);assert.equal(fresh.wins,0);assert.equal(fresh.season.xp,0);
   assert.equal((await call('me',null,player.cookie)).body.user,null);assert.equal((await call('me',null,otherSession.cookie)).body.user,null);assert.equal((await call('login',{email:'reset-owner@example.test',password})).status,200);
   assert.equal((await call('management-reset/execute',data,owner.cookie)).status,400);

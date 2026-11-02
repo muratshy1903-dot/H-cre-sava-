@@ -16,8 +16,9 @@ export function createManagement({db,account,save,atomic,budget,fail,json,sha,wo
  const pool=(room,end)=>{const row=db.prepare('SELECT prize FROM room_pools WHERE room=? AND round_end=?').get(room,end);return row?.prize};
  const persistPool=w=>db.prepare('INSERT INTO room_pools(room,round_end,prize) VALUES(?,?,?) ON CONFLICT(room) DO UPDATE SET round_end=excluded.round_end,prize=excluded.prize').run(w.room,w.roundEnd,Math.floor(w.prize));
  const roomList=()=>rooms.map(r=>{const timing=roomTiming(r.id),w=worlds.get(r.id),list=[...(w?.players.values()||[])].filter(p=>!p.bot),conf=config(r.id);return{...r,...timing,...conf,boost:boostConfig(r.id),prize:w&&w.roundEnd===timing.endsAt?w.prize:pool(r.id,timing.endsAt)??conf.base_prize,players:list.filter(p=>!p.spectator&&p.cells.length).length,spectators:list.filter(p=>p.spectator).length,connections:list.length}});
- const livePlayers=()=>[...clients()].filter(ws=>ws.readyState===1&&ws.world).map(ws=>{const player=ws.world.players.get(ws.pid),a=ws.user;return{connection:ws.pid,accountId:a?.id||null,name:player?.name||a?.name||'Misafir',room:ws.world.room,score:Math.floor(player?.cells.reduce((sum,c)=>sum+c.mass,0)||0),max:player?.max||0,cells:player?.cells.length||0,gold:Math.floor(player?.gold||0),bonus:Math.floor(player?.bonus||0),spectator:!!player?.spectator,alive:!!player?.cells.length,team:player?.team||'',clanId:a?.clanId||null,premium:!!(a?.premiumUntil>Date.now()),role:a?.role||'player',mutedUntil:a?.mutedUntil||0,lastPingAgoMs:Math.max(0,Date.now()-ws.lastPing)}});
+ const livePlayers=()=>[...clients()].filter(ws=>ws.readyState===1&&ws.world).map(ws=>{const player=ws.world.players.get(ws.pid),a=ws.user;return{connection:ws.pid,accountId:a?.id||null,name:player?.name||a?.name||'Misafir',room:ws.world.room,massLimit:ws.world.massLimits().total,score:Math.floor(player?.cells.reduce((sum,c)=>sum+c.mass,0)||0),max:player?.max||0,cells:player?.cells.length||0,gold:Math.floor(player?.gold||0),bonus:Math.floor(player?.bonus||0),spectator:!!player?.spectator,alive:!!player?.cells.length,team:player?.team||'',clanId:a?.clanId||null,premium:!!(a?.premiumUntil>Date.now()),role:a?.role||'player',mutedUntil:a?.mutedUntil||0,lastPingAgoMs:Math.max(0,Date.now()-ws.lastPing)}});
 
+ let announcement=null;try{announcement=JSON.parse(db.prepare('SELECT value FROM management_settings WHERE key=?').get('global_announcement')?.value||'null')}catch{}
  async function route(req,res,url,p,data){
   if(url.pathname==='/api/management-status'){json(res,200,{setupAvailable:setupAvailable()});return true;}
   if(url.pathname==='/api/admin-setup'&&req.method==='POST'){
@@ -74,7 +75,7 @@ export function createManagement({db,account,save,atomic,budget,fail,json,sha,wo
   }else if(action==='score'){
    const peer=connections.get(Number(data.target)),w=peer?.world,player=w?.players.get(peer.pid),amount=Number(data.amount);
    if(!player||player.spectator||!player.cells.length)fail('Oyuncu hesabıyla bir odada canlı olmalı');
-   if(!Number.isSafeInteger(amount)||amount<1||amount>5500000||!reason)fail('1-5.500.000 arasında skor ve işlem nedeni gerekli');
+   if(!Number.isSafeInteger(amount)||amount<1||amount>w.massLimits().total||!reason)fail('Skor, oda sınırı içinde olmalı ve işlem nedeni gerekli');
    const capacity=w.growthCapacity(player),added=Math.min(capacity,amount);
    if(added<=0)fail('Oyuncu kütle sınırında');
    atomic(()=>log(p,'score',Number(data.target),JSON.stringify({room:w.room,requested:amount,added,reason})),p,'admin:score');
@@ -86,7 +87,7 @@ export function createManagement({db,account,save,atomic,budget,fail,json,sha,wo
   }else if(action==='finishRoom'){
    const id=String(data.room||'');if(!rooms.some(r=>r.id===id))fail('Oda bulunamadı');const w=worldFor(id);w.finishRequested=[...w.players.values()].some(a=>!a.bot&&a.cells.length);if(!w.finishRequested){w.prize=w.basePrize;const t=roomTiming(id);w.roundStart=t.startsAt;w.roundEnd=t.endsAt;}log(p,action,0,id);
   }else if(action==='announce'){
-   const text=String(data.text||'').trim().slice(0,300);if(!text)fail('Duyuru yaz');const packet=JSON.stringify({type:'chat',name:'YÖNETİM',text});for(const ws of clients())if(ws.readyState===1)ws.send(packet);log(p,action,0,text);
+   const text=String(data.text||'').trim().slice(0,300);if(!text)fail('Duyuru yaz');const notice={text,at:Date.now()};atomic(()=>{db.prepare("INSERT INTO management_settings(key,value) VALUES('global_announcement',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run(JSON.stringify(notice));log(p,action,0,text)},p,'admin:announce');announcement=notice;const packet=JSON.stringify({type:'announcement',...notice});for(const ws of clients())if(ws.readyState===1)ws.send(packet);
   }else if(action==='pin'){
    const kind=data.kind,amount=Number(data.amount);if(!['gold','premium'].includes(kind)||!Number.isSafeInteger(amount)||amount<1||amount>(kind==='premium'?365:100000000))fail('PIN türü veya miktar geçersiz');const code='AGM-'+crypto.randomBytes(16).toString('hex').toUpperCase();db.prepare('INSERT INTO pins(hash,kind,amount) VALUES(?,?,?)').run(sha(code),kind,amount);log(p,'pin',0,kind+':'+amount);result={ok:true,code};
   }else if(action==='reportStatus'){
@@ -94,5 +95,5 @@ export function createManagement({db,account,save,atomic,budget,fail,json,sha,wo
   }else fail('İşlem bulunamadı',404);
   json(res,200,result);return true;
  }
- return {route,config,roomList,pool,persistPool,boostConfig};
+ return {route,config,roomList,pool,persistPool,boostConfig,get announcement(){return announcement},clearAnnouncement(){announcement=null;db.prepare("DELETE FROM management_settings WHERE key='global_announcement'").run()}};
 }

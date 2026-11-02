@@ -1,0 +1,10 @@
+export function createRecordAssets({db,account,fail}){
+ if(!db.prepare('PRAGMA table_info(record_assets)').all().some(c=>c.name==='display_name'))db.exec('ALTER TABLE record_assets ADD COLUMN display_name TEXT');
+ const owned=id=>db.prepare('SELECT r.*,COALESCE(a.owner,r.account_id) owner,COALESCE(a.display_name,r.name) display_name FROM records r LEFT JOIN record_assets a ON a.record_id=r.id WHERE r.id=?').get(Number(id));
+ const isCurrent=r=>!!r&&r.score>=Math.max(db.prepare('SELECT MAX(score) score FROM records WHERE room=?').get(r.room)?.score||0,db.prepare('SELECT score FROM room_records WHERE room=?').get(r.room)?.score||0);
+ const requireOwned=(id,p)=>{const r=owned(id);if(!r||r.owner!==p.id||!isCurrent(r))fail('Bu güncel oda rekoru sana ait değil');return r};
+ const leader=p=>!!p?.clanId&&db.prepare('SELECT owner FROM clans WHERE id=?').get(p.clanId)?.owner===p.id;
+ function edit(p,data){if(!['recordRename','recordTransfer'].includes(data.action))return null;const r=requireOwned(data.record,p);if(db.prepare("SELECT id FROM listings WHERE record_id=? AND status='active'").get(r.id))fail('Önce rekorun satış ilanını iptal et');let target=p,name=String(data.value||'').trim().slice(0,30);if(data.action==='recordRename'){if(!name||/[\x00-\x1f]/.test(name))fail('Geçerli rekor ismi gerekli')}else{target=account(Number(data.target));if(!target||target.id===p.id||target.bannedUntil>Date.now())fail('Geçerli başka bir alıcı hesap gerekli');name=target.name}if(p.gold<100000)fail('Bu işlem için 100.000 Gold gerekli');p.gold-=100000;db.prepare('INSERT INTO record_assets(record_id,owner,display_name) VALUES(?,?,?) ON CONFLICT(record_id) DO UPDATE SET owner=excluded.owner,display_name=excluded.display_name').run(r.id,target.id,name);return {recordId:r.id,cost:100000}}
+ function display(room,record){if(!record)return null;const row=db.prepare('SELECT id FROM records WHERE room=? AND score=? ORDER BY id LIMIT 1').get(room,record.score);const asset=row?owned(row.id):null;return {...record,id:row?.id||null,name:asset?.display_name||record.name,owner:asset?.owner||null}}
+ return {owned,isCurrent,requireOwned,leader,edit,display};
+}

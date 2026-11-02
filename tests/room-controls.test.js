@@ -39,7 +39,7 @@ test('custom rooms, time, rewards and Boost persist across restart; mute blocks 
   assert.equal((await manage({action:'createRoom',room:'TEST-ODA',mode:'ffa',minutes:20,basePrize:80000})).status,200);
   assert.equal((await manage({action:'createRoom',room:'test-oda',mode:'ffa',minutes:20,basePrize:1})).status,400);
   assert.equal((await manage({action:'createRoom',room:'<script>',mode:'ffa',minutes:20,basePrize:1})).status,400);
-  let rooms=(await call(base,'rooms')).body;assert.equal(rooms.length,89);const initial=rooms.find(r=>r.id==='TEST-ODA');assert.equal(initial.roundDurationMs,1200000);
+  let rooms=(await call(base,'rooms')).body;assert.equal(rooms.length,91);const initial=rooms.find(r=>r.id==='TEST-ODA');assert.equal(initial.roundDurationMs,1200000);
   const ws=await connect(base,player.cookie);await next(ws,'joined',()=>ws.send(JSON.stringify({type:'join',room:'TEST-ODA',name:'Player'})));
   await manage({action:'reward',room:'TEST-ODA',amount:5000,reason:'Test'});
   assert.equal((await manage({action:'addTime',room:'TEST-ODA',minutes:10})).status,200);
@@ -48,7 +48,7 @@ test('custom rooms, time, rewards and Boost persist across restart; mute blocks 
   assert.equal((await manage({action:'roomBoost',room:'TEST-ODA',goldRate:7,feedMs:50,splitMs:50,minutes:60})).status,200);
   assert.equal((await manage({action:'roomBoost',room:'TEST-ODA',goldRate:Infinity,feedMs:50,splitMs:50,minutes:60})).status,400);
   const snap=await next(ws,'state');assert.equal(snap.boost.gold,7);assert.equal(snap.prize,85000);assert.equal(snap.self.cells,1);assert.ok(snap.timeLeft>1700);
-  const panel=(await call(base,'management',null,admin.cookie)).body;assert.equal(panel.stats.activePlayers,1);assert.equal(panel.rooms.length,89);assert.equal(panel.livePlayers[0].room,'TEST-ODA');assert.equal(panel.rooms.find(r=>r.id==='TEST-ODA').endsAt,initial.endsAt+600000);
+  const panel=(await call(base,'management',null,admin.cookie)).body;assert.equal(panel.stats.activePlayers,1);assert.equal(panel.rooms.length,91);assert.equal(panel.livePlayers[0].room,'TEST-ODA');assert.equal(panel.rooms.find(r=>r.id==='TEST-ODA').endsAt,initial.endsAt+600000);
   assert.equal((await manage({action:'mute',target:player.body.user.id,hours:24})).status,200);
   const error=await next(ws,'error',()=>ws.send(JSON.stringify({type:'chat',text:'blocked'})));assert.match(error.message,/Sohbet/);
   assert.equal((await manage({action:'mute',target:player.body.user.id,hours:0})).status,200);

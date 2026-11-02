@@ -1,0 +1,1 @@
+export function allyMarkers(players,self,center){if(!self)return [];return [...players].filter(p=>p.id!==self.id&&!p.spectator&&p.cells.length&&((self.team&&p.team===self.team)||(self.clanId&&p.clanId===self.clanId))).map(p=>({id:p.id,...center(p),relation:self.team&&p.team===self.team?'team':'clan'})).map(({id,x,y,relation})=>({id,x,y,relation}))}
