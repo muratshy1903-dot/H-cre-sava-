@@ -1,232 +1,232 @@
 export const SKIN_CATALOG=[
   {
-    "id": "agarz1",
-    "name": "agarz1",
-    "category": "AgarZ",
+    "id": "agarm1",
+    "name": "agarm1",
+    "category": "Agarm",
     "image": "/skin-art/agarz1.webp",
     "source": "https://agarz.com/tr/yeni-skinler-3/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid69062_agarz1.png"
   },
   {
-    "id": "agarz10",
-    "name": "agarz10",
-    "category": "AgarZ",
+    "id": "agarm10",
+    "name": "agarm10",
+    "category": "Agarm",
     "image": "/skin-art/agarz10.webp",
     "source": "https://agarz.com/tr/yeni-skinler-3/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid69062_agarz10.png"
   },
   {
-    "id": "agarz100",
-    "name": "agarz100",
-    "category": "AgarZ",
+    "id": "agarm100",
+    "name": "agarm100",
+    "category": "Agarm",
     "image": "/skin-art/agarz100.webp",
     "source": "https://agarz.com/tr/yeni-skinler-3/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid69062_agarz100.png"
   },
   {
-    "id": "agarz101",
-    "name": "agarz101",
-    "category": "AgarZ",
+    "id": "agarm101",
+    "name": "agarm101",
+    "category": "Agarm",
     "image": "/skin-art/agarz101.webp",
     "source": "https://agarz.com/tr/yeni-skinler-3/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid69062_agarz101.png"
   },
   {
-    "id": "agarz102",
-    "name": "agarz102",
-    "category": "AgarZ",
+    "id": "agarm102",
+    "name": "agarm102",
+    "category": "Agarm",
     "image": "/skin-art/agarz102.webp",
     "source": "https://agarz.com/tr/yeni-skinler-3/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid69062_agarz102.png"
   },
   {
-    "id": "agarz103",
-    "name": "agarz103",
-    "category": "AgarZ",
+    "id": "agarm103",
+    "name": "agarm103",
+    "category": "Agarm",
     "image": "/skin-art/agarz103.webp",
     "source": "https://agarz.com/tr/yeni-skinler-3/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid69062_agarz103.png"
   },
   {
-    "id": "agarz104",
-    "name": "agarz104",
-    "category": "AgarZ",
+    "id": "agarm104",
+    "name": "agarm104",
+    "category": "Agarm",
     "image": "/skin-art/agarz104.webp",
     "source": "https://agarz.com/tr/yeni-skinler-3/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid69062_agarz104.png"
   },
   {
-    "id": "agarz105",
-    "name": "agarz105",
-    "category": "AgarZ",
+    "id": "agarm105",
+    "name": "agarm105",
+    "category": "Agarm",
     "image": "/skin-art/agarz105.webp",
     "source": "https://agarz.com/tr/yeni-skinler-3/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid69062_agarz105.png"
   },
   {
-    "id": "agarz106",
-    "name": "agarz106",
-    "category": "AgarZ",
+    "id": "agarm106",
+    "name": "agarm106",
+    "category": "Agarm",
     "image": "/skin-art/agarz106.webp",
     "source": "https://agarz.com/tr/yeni-skinler-3/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid69062_agarz106.png"
   },
   {
-    "id": "agarz107",
-    "name": "agarz107",
-    "category": "AgarZ",
+    "id": "agarm107",
+    "name": "agarm107",
+    "category": "Agarm",
     "image": "/skin-art/agarz107.webp",
     "source": "https://agarz.com/tr/yeni-skinler-3/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid69062_agarz107.png"
   },
   {
-    "id": "agarz108",
-    "name": "agarz108",
-    "category": "AgarZ",
+    "id": "agarm108",
+    "name": "agarm108",
+    "category": "Agarm",
     "image": "/skin-art/agarz108.webp",
     "source": "https://agarz.com/tr/yeni-skinler-3/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid69062_agarz108.png"
   },
   {
-    "id": "agarz109",
-    "name": "agarz109",
-    "category": "AgarZ",
+    "id": "agarm109",
+    "name": "agarm109",
+    "category": "Agarm",
     "image": "/skin-art/agarz109.webp",
     "source": "https://agarz.com/tr/yeni-skinler-3/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid69062_agarz109.png"
   },
   {
-    "id": "agarz11",
-    "name": "agarz11",
-    "category": "AgarZ",
+    "id": "agarm11",
+    "name": "agarm11",
+    "category": "Agarm",
     "image": "/skin-art/agarz11.webp",
     "source": "https://agarz.com/tr/yeni-skinler-3/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid69062_agarz11.png"
   },
   {
-    "id": "agarz110",
-    "name": "agarz110",
-    "category": "AgarZ",
+    "id": "agarm110",
+    "name": "agarm110",
+    "category": "Agarm",
     "image": "/skin-art/agarz110.webp",
     "source": "https://agarz.com/tr/yeni-skinler-3/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid69062_agarz110.png"
   },
   {
-    "id": "agarz111",
-    "name": "agarz111",
-    "category": "AgarZ",
+    "id": "agarm111",
+    "name": "agarm111",
+    "category": "Agarm",
     "image": "/skin-art/agarz111.webp",
     "source": "https://agarz.com/tr/yeni-skinler-3/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid69062_agarz111.png"
   },
   {
-    "id": "agarz0001",
-    "name": "agarz0001",
-    "category": "AgarZ",
+    "id": "agarm0001",
+    "name": "agarm0001",
+    "category": "Agarm",
     "image": "/skin-art/agarz0001.webp",
     "source": "https://agarz.com/tr/yeni-skinler-4/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid102995_agarz0001.png"
   },
   {
-    "id": "agarz0002",
-    "name": "agarz0002",
-    "category": "AgarZ",
+    "id": "agarm0002",
+    "name": "agarm0002",
+    "category": "Agarm",
     "image": "/skin-art/agarz0002.webp",
     "source": "https://agarz.com/tr/yeni-skinler-4/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid102995_agarz0002.png"
   },
   {
-    "id": "agarz0003",
-    "name": "agarz0003",
-    "category": "AgarZ",
+    "id": "agarm0003",
+    "name": "agarm0003",
+    "category": "Agarm",
     "image": "/skin-art/agarz0003.webp",
     "source": "https://agarz.com/tr/yeni-skinler-4/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid102995_agarz0003.png"
   },
   {
-    "id": "agarz0004",
-    "name": "agarz0004",
-    "category": "AgarZ",
+    "id": "agarm0004",
+    "name": "agarm0004",
+    "category": "Agarm",
     "image": "/skin-art/agarz0004.webp",
     "source": "https://agarz.com/tr/yeni-skinler-4/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid102995_agarz0004.png"
   },
   {
-    "id": "agarz0005",
-    "name": "agarz0005",
-    "category": "AgarZ",
+    "id": "agarm0005",
+    "name": "agarm0005",
+    "category": "Agarm",
     "image": "/skin-art/agarz0005.webp",
     "source": "https://agarz.com/tr/yeni-skinler-4/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid102995_agarz0005.png"
   },
   {
-    "id": "agarz0007",
-    "name": "agarz0007",
-    "category": "AgarZ",
+    "id": "agarm0007",
+    "name": "agarm0007",
+    "category": "Agarm",
     "image": "/skin-art/agarz0007.webp",
     "source": "https://agarz.com/tr/yeni-skinler-4/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid102995_agarz0007.png"
   },
   {
-    "id": "agarz0008",
-    "name": "agarz0008",
-    "category": "AgarZ",
+    "id": "agarm0008",
+    "name": "agarm0008",
+    "category": "Agarm",
     "image": "/skin-art/agarz0008.webp",
     "source": "https://agarz.com/tr/yeni-skinler-4/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid102995_agarz0008.png"
   },
   {
-    "id": "agarz0009",
-    "name": "agarz0009",
-    "category": "AgarZ",
+    "id": "agarm0009",
+    "name": "agarm0009",
+    "category": "Agarm",
     "image": "/skin-art/agarz0009.webp",
     "source": "https://agarz.com/tr/yeni-skinler-4/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid102995_agarz0009.png"
   },
   {
-    "id": "agarz0010",
-    "name": "agarz0010",
-    "category": "AgarZ",
+    "id": "agarm0010",
+    "name": "agarm0010",
+    "category": "Agarm",
     "image": "/skin-art/agarz0010.webp",
     "source": "https://agarz.com/tr/yeni-skinler-4/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid102995_agarz0010.png"
   },
   {
-    "id": "agarz0011",
-    "name": "agarz0011",
-    "category": "AgarZ",
+    "id": "agarm0011",
+    "name": "agarm0011",
+    "category": "Agarm",
     "image": "/skin-art/agarz0011.webp",
     "source": "https://agarz.com/tr/yeni-skinler-4/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid102995_agarz0011.png"
   },
   {
-    "id": "agarz0012",
-    "name": "agarz0012",
-    "category": "AgarZ",
+    "id": "agarm0012",
+    "name": "agarm0012",
+    "category": "Agarm",
     "image": "/skin-art/agarz0012.webp",
     "source": "https://agarz.com/tr/yeni-skinler-4/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid102995_agarz0012.png"
   },
   {
-    "id": "agarz0013",
-    "name": "agarz0013",
-    "category": "AgarZ",
+    "id": "agarm0013",
+    "name": "agarm0013",
+    "category": "Agarm",
     "image": "/skin-art/agarz0013.webp",
     "source": "https://agarz.com/tr/yeni-skinler-4/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid102995_agarz0013.png"
   },
   {
-    "id": "agarz0014",
-    "name": "agarz0014",
-    "category": "AgarZ",
+    "id": "agarm0014",
+    "name": "agarm0014",
+    "category": "Agarm",
     "image": "/skin-art/agarz0014.webp",
     "source": "https://agarz.com/tr/yeni-skinler-4/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid102995_agarz0014.png"
   },
   {
-    "id": "agarz0015",
-    "name": "agarz0015",
-    "category": "AgarZ",
+    "id": "agarm0015",
+    "name": "agarm0015",
+    "category": "Agarm",
     "image": "/skin-art/agarz0015.webp",
     "source": "https://agarz.com/tr/yeni-skinler-4/sayfa-0",
     "sourceImage": "https://cdn.agarz.com/uid102995_agarz0015.png"
@@ -473,5 +473,5 @@ export const SKIN_CATALOG=[
   }
 ];
 const skinById=new Map(SKIN_CATALOG.map(s=>[s.id,s]));
-export function catalogSkin(id){id=String(id);if(skinById.has(id))return skinById.get(id);const n=Number(id.slice(4));if(!/^skin([1-9]|[1-6][0-9]|7[0-2])$/.test(id))return null;return SKIN_CATALOG[(n-1)%SKIN_CATALOG.length]}
+export function catalogSkin(id){id=String(id);if(/^agarz\d+$/.test(id))id=id.replace(/^agarz/,'agarm');if(skinById.has(id))return skinById.get(id);const n=Number(id.slice(4));if(!/^skin([1-9]|[1-6][0-9]|7[0-2])$/.test(id))return null;return SKIN_CATALOG[(n-1)%SKIN_CATALOG.length]}
 export function skinImageUrl(id){return /^custom-[a-f0-9]{24}$/.test(String(id))?'/skins/'+id.slice(7)+'.webp':catalogSkin(id)?.image||null}

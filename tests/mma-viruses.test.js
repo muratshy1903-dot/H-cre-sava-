@@ -33,10 +33,10 @@ test('server MMA spending survives reconnect and never changes account Gold or B
  const {startServer}=await import('../server/index.js');const server=startServer({port:0});await once(server,'listening');const origin='http://127.0.0.1:'+server.address().port;let ws;
  try{
   const r=await fetch(origin+'/api/register',{method:'POST',headers:{'content-type':'application/json',origin},body:JSON.stringify({email:'mma@test.example',password:'safe-test-password',name:'MMA test'})});assert.equal(r.status,201);const cookie=r.headers.get('set-cookie').split(';')[0],initial=(await r.json()).user;
-  const state=()=>new Promise((resolve,reject)=>{const timer=setTimeout(()=>{ws.off('message',on);reject(Error('State timeout'))},2500);function on(raw){const m=JSON.parse(raw);if(m.type==='state'){clearTimeout(timer);ws.off('message',on);resolve(m)}}ws.on('message',on)});
-  const join=async room=>{const pending=state();ws.send(JSON.stringify({type:'join',room,name:'MMA test'}));return pending};
+  const state=(check=()=>true)=>new Promise((resolve,reject)=>{const timer=setTimeout(()=>{ws.off('message',on);reject(Error('State timeout'))},2500);function on(raw){const m=JSON.parse(raw);if(m.type==='state'&&check(m)){clearTimeout(timer);ws.off('message',on);resolve(m)}}ws.on('message',on)});
+  const join=async room=>{const pending=state(m=>m.room===room);ws.send(JSON.stringify({type:'join',room,name:'MMA test'}));return pending};
   ws=new WebSocket(origin.replace('http:','ws:')+'/ws',{headers:{Origin:origin,Cookie:cookie}});await once(ws,'open');const first=await join('MMA-1');assert.equal(first.self.roomGold,MMA_GOLD);
-  const next=state();ws.send(JSON.stringify({type:'gold',kind:'big'}));assert.equal((await next).self.roomGold,MMA_GOLD-100);
+  const next=state(m=>m.self.roomGold===MMA_GOLD-100);ws.send(JSON.stringify({type:'gold',kind:'big'}));assert.equal((await next).self.roomGold,MMA_GOLD-100);
   const ffa=await join('FFA-1');assert.equal(ffa.self.gold,initial.gold);assert.equal(ffa.self.bonus,initial.bonus);assert.equal(ffa.self.roomGold,null);
   assert.equal((await join('MMA-1')).self.roomGold,MMA_GOLD-100);
   ws.terminate();await new Promise(r=>server.shutdown(r));

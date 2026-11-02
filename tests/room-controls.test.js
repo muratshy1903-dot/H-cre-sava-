@@ -53,7 +53,21 @@ test('custom rooms, time, rewards and Boost persist across restart; mute blocks 
   const error=await next(ws,'error',()=>ws.send(JSON.stringify({type:'chat',text:'blocked'})));assert.match(error.message,/Sohbet/);
   assert.equal((await manage({action:'mute',target:player.body.user.id,hours:0})).status,200);
   const chat=await next(ws,'chat',()=>ws.send(JSON.stringify({type:'chat',text:'allowed'})));assert.equal(chat.text,'allowed');
+  assert.equal((await manage({action:'goldToPrize',room:'TEST-ODA',enabled:true})).status,200);
+  assert.equal((await call(base,'management',{action:'goldToPrize',room:'TEST-ODA',enabled:false},player.cookie)).status,403);
+  assert.equal((await manage({action:'goldToPrize',room:'MMA-1',enabled:true})).status,400);
+  assert.equal((await manage({action:'goldToPrize',room:'TEST-ODA',enabled:'false'})).status,400);
+  assert.equal((await manage({action:'setRoomTime',room:'FFA-5',minutes:17})).status,200);
+  assert.equal((await manage({action:'setRoomTime',room:'MMA-3',minutes:20})).status,200);
+  assert.equal((await manage({action:'setRoomTime',room:'FFA-5',minutes:0})).status,400);
+  assert.equal((await call(base,'management',{action:'setRoomTime',room:'FFA-5',minutes:1},player.cookie)).status,403);
   await stop();base=await start();rooms=(await call(base,'rooms')).body;const restored=rooms.find(r=>r.id==='TEST-ODA');assert.equal(restored.endsAt,initial.endsAt+600000);assert.equal(restored.boost.gold,7);
+  assert.equal(rooms.find(r=>r.id==='FFA-5').roundDurationMs,17*60000);
+  assert.equal(rooms.find(r=>r.id==='MMA-3').roundDurationMs,20*60000);
+  assert.equal(rooms.find(r=>r.id==='MMA-3').minutes,20);
+  const restoredPanel=(await call(base,'management',null,admin.cookie)).body;
+  assert.equal(restoredPanel.rooms.find(r=>r.id==='TEST-ODA').gold_to_prize,1);
+  assert.equal(restoredPanel.rooms.find(r=>r.id==='FFA-1').gold_to_prize,0);
   const after=await connect(base);const joined=await next(after,'state',()=>after.send(JSON.stringify({type:'join',room:'TEST-ODA'})));assert.equal(joined.prize,85000);assert.equal(joined.boost.gold,7);
  }finally{if(child)await stop();await rm(dir,{recursive:true,force:true})}
 });

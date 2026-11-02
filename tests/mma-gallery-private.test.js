@@ -14,7 +14,7 @@ test('MMA room wallets are independently renewed and existing MMA-1 balance is p
  const p={gold:123,bonus:456,mmaWallet:{balance:17,renewsAt:100000+MMA_RENEW_MS}},now=100000;
  assert.equal(mmaWallet(p,now,'MMA-1').balance,17);mmaWallet(p,now,'MMA-2').balance=111;mmaWallet(p,now,'MMA-3').balance=222;
  const stored=JSON.parse(JSON.stringify(p));assert.equal(mmaWallet(stored,now,'MMA-1').balance,17);assert.equal(mmaWallet(stored,now,'MMA-2').balance,111);assert.equal(mmaWallet(stored,now,'MMA-3').balance,222);assert.equal(mmaWallet(stored,now+MMA_RENEW_MS,'MMA-2').balance,MMA_GOLD);assert.equal(stored.mmaWallets['MMA-3'].balance,222);assert.equal(stored.gold,123);assert.equal(stored.bonus,456);
- assert.ok(SKIN_CATALOG.filter(x=>x.category==='AgarZ').length>=29);assert.ok(!SKIN_CATALOG.some(x=>['skin1','skin2','skin3','skin4'].includes(x.id)));
+ assert.ok(SKIN_CATALOG.filter(x=>x.category==='Agarm').length>=29);assert.ok(!SKIN_CATALOG.some(x=>['skin1','skin2','skin3','skin4'].includes(x.id)));
 });
 
 test('each successful upload costs 10k, stays registered after relogin, and a copied skin code cannot be used by another account',async()=>{

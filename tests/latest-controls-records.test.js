@@ -11,7 +11,7 @@ test('record rename/transfer charge 100k atomically, only clan leaders buy, bann
  const call=async(route,data,cookie)=>{const r=await fetch(base+'/api/'+route,{method:data?'POST':'GET',headers:{Origin:base,...(data?{'content-type':'application/json'}:{}),...(cookie?{Cookie:cookie}:{})},body:data?JSON.stringify(data):undefined});return {status:r.status,body:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0]}};
  const connect=async cookie=>{const w=new WebSocket(base.replace('http:','ws:')+'/ws',{headers:{Origin:base,...(cookie?{Cookie:cookie}:{})}});sockets.push(w);w.messages=[];w.on('message',raw=>w.messages.push(JSON.parse(raw)));await once(w,'open');return w};
  const wait=async(ws,check,action)=>{const at=ws.messages.length;action?.();const end=Date.now()+3000;while(Date.now()<end){const found=ws.messages.slice(at).find(check);if(found)return found;await new Promise(r=>setTimeout(r,10))}throw Error('state timeout')};
- const join=(ws,room,extra={})=>wait(ws,m=>m.type==='state'||m.type==='error',()=>ws.send(JSON.stringify({type:'join',room,...extra})));
+ const join=(ws,room,extra={})=>wait(ws,m=>m.type==='state'&&m.room===room||m.type==='error',()=>ws.send(JSON.stringify({type:'join',room,...extra})));
  try{
   const admin=await call('register',{email:'admin@latest.test',name:'Admin',password:'safe-test-password'}),a=await call('register',{email:'a@latest.test',name:'A',password:'safe-test-password'}),b=await call('register',{email:'b@latest.test',name:'B',password:'safe-test-password'});grantAdmin('admin@latest.test');
   const act=(who,action,data={})=>call('action',{action,...data},who.cookie),manage=data=>call('management',data,admin.cookie);
