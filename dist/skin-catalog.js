@@ -1,0 +1,3 @@
+export const SKIN_CATALOG=[{id:'skin1',name:'Kızıl Düellocu',category:'Anime',image:'/skin-art/skin1.webp'},{id:'skin2',name:'Zümrüt Kraliçe',category:'Glamour',image:'/skin-art/skin2.webp'},{id:'skin3',name:'Altın Savaşçı',category:'Sinema',image:'/skin-art/skin3.webp'},{id:'skin4',name:'Neon Gece',category:'Anime',image:'/skin-art/skin4.webp'}];
+export function catalogSkin(id){const n=Number(String(id).replace(/^skin/,''));if(!/^skin([1-9]|[1-6][0-9]|7[0-2])$/.test(String(id)))return null;return SKIN_CATALOG[(n-1)%SKIN_CATALOG.length]}
+export function skinImageUrl(id){return /^custom-[a-f0-9]{24}$/.test(String(id))?'/skins/'+id.slice(7)+'.webp':catalogSkin(id)?.image||null}

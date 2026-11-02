@@ -1,5 +1,6 @@
+import {PANEL_PERMISSIONS,PANEL_ACTIONS} from '../dist/panel-permissions.js';
 import crypto from 'node:crypto';
-export function createManagement({db,account,save,atomic,budget,fail,json,sha,worlds,worldFor,connections,rooms,roomTiming,clients,canManage=p=>p?.role==='admin',isOwner=p=>p?.role==='admin'}){
+export function createManagement({db,account,save,atomic,budget,fail,json,sha,worlds,worldFor,connections,rooms,roomTiming,clients,canManage=p=>p?.role==='admin',isOwner=p=>p?.role==='admin',hasPermission=(p,key)=>canManage(p),permissionsFor=p=>Object.keys(PANEL_PERMISSIONS)}){
  db.exec(`CREATE TABLE IF NOT EXISTS room_pools(room TEXT PRIMARY KEY,round_end INTEGER NOT NULL,prize INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS room_settings(room TEXT PRIMARY KEY,base_prize INTEGER NOT NULL DEFAULT 50000,closed INTEGER NOT NULL DEFAULT 0);
  CREATE TABLE IF NOT EXISTS management_settings(key TEXT PRIMARY KEY,value TEXT);
@@ -30,10 +31,19 @@ export function createManagement({db,account,save,atomic,budget,fail,json,sha,wo
   if(!canManage(p))fail('Yönetici yetkisi gerekli',403);
   if(req.method==='GET'){
    const users=db.prepare('SELECT id FROM accounts ORDER BY id DESC LIMIT 200').all().map(r=>account(r.id)),live=livePlayers();
-   json(res,200,{stats:{accounts:db.prepare('SELECT count(*) n FROM accounts').get().n,online:live.length,activePlayers:live.filter(p=>p.alive&&!p.spectator).length,spectators:live.filter(p=>p.spectator).length,guests:live.filter(p=>!p.accountId).length,activeRooms:new Set(live.map(p=>p.room)).size},livePlayers:live,canReset:isOwner(p),serverNow:Date.now(),rooms:roomList(),users:users.map(a=>({id:a.id,name:a.name,gold:a.gold,bonus:a.bonus,premiumUntil:a.premiumUntil,bannedUntil:a.bannedUntil||0,mutedUntil:a.mutedUntil||0,role:a.role||'player'})),reports:db.prepare('SELECT * FROM reports ORDER BY id DESC LIMIT 100').all()});return true;
+   json(res,200,{stats:{accounts:db.prepare('SELECT count(*) n FROM accounts').get().n,online:live.length,activePlayers:live.filter(p=>p.alive&&!p.spectator).length,spectators:live.filter(p=>p.spectator).length,guests:live.filter(p=>!p.accountId).length,activeRooms:new Set(live.map(p=>p.room)).size},livePlayers:hasPermission(p,'live')||hasPermission(p,'score')||hasPermission(p,'chat')?live:[],permissions:permissionsFor(p),canDelegate:isOwner(p),permissionCatalog:isOwner(p)?PANEL_PERMISSIONS:{},canReset:isOwner(p),serverNow:Date.now(),rooms:roomList(),users:(isOwner(p)||hasPermission(p,'users')||hasPermission(p,'economy')||hasPermission(p,'bans')||hasPermission(p,'chat')?users:[]).map(a=>({id:a.id,name:a.name,gold:a.gold,bonus:a.bonus,premiumUntil:a.premiumUntil,bannedUntil:a.bannedUntil||0,mutedUntil:a.mutedUntil||0,role:a.role||'player',panelPermissions:isOwner(p)?permissionsFor(a):[]})),reports:hasPermission(p,'chat')?db.prepare('SELECT * FROM reports ORDER BY id DESC LIMIT 100').all():[]});return true;
   }
   if(req.method!=='POST')fail('Yöntem desteklenmiyor',405);
   budget(req,'management',40);const action=String(data.action||''),reason=String(data.reason||'').trim().slice(0,200);let result={ok:true};
+  if(action==='panelAccess'){
+   if(!isOwner(p))fail('Yetkileri yalnızca hesap sahibi düzenleyebilir',403);
+   const ref=String(data.target||'').trim(),id=/^\d+$/.test(ref)?Number(ref):db.prepare('SELECT id FROM accounts WHERE lower(email)=?').get(ref.toLowerCase())?.id,a=account(id);
+   if(!a)fail('Hesap bulunamadı',404);if(isOwner(a))fail('Hesap sahibinin yetkileri değiştirilemez',403);
+   if(!Array.isArray(data.permissions)||data.permissions.some(k=>typeof k!=='string'||!Object.hasOwn(PANEL_PERMISSIONS,k)))fail('Geçersiz panel yetkisi');
+   const permissions=[...new Set(data.permissions)];atomic(()=>{account(a.id);a.panelPermissions=permissions;a.role=permissions.length?'moderator':'player';save(a);log(p,'panelAccess',a.id,JSON.stringify(permissions))},p,'admin:panelAccess');
+   json(res,200,{ok:true,target:a.id,permissions});return true;
+  }
+  const required=PANEL_ACTIONS[action];if(!required||!hasPermission(p,required))fail('Bu işlem için panel yetkin yok',403);
   if(action==='createRoom'){
    const id=String(data.room||'').trim(),minutes=Number(data.minutes),base=Number(data.basePrize);if(!/^[\p{L}\p{N}][\p{L}\p{N} _-]{0,23}$/u.test(id)||rooms.some(r=>r.id.toLocaleLowerCase('tr')===id.toLocaleLowerCase('tr')))fail('Oda adı geçersiz veya zaten kullanılıyor');if(rooms.length>=250)fail('En fazla 250 oda açılabilir');if(!Number.isInteger(minutes)||minutes<1||minutes>1440||!Number.isSafeInteger(base)||base<0||base>100000000)fail('Süre 1-1440 dakika, ödül 0-100.000.000 olmalı');if(!['ffa','nogold','special','boost'].includes(data.mode))fail('Oda türü geçersiz');const definition={id,mode:data.mode,minutes,durationMs:minutes*60000,scheduleEnd:Date.now()+minutes*60000,custom:true};
    atomic(()=>{persistControl(definition);db.prepare('INSERT INTO room_settings(room,base_prize,closed) VALUES(?,?,0)').run(id,base);log(p,action,0,JSON.stringify(definition));},p,'admin:createRoom');rooms.push(definition);result={ok:true,room:id};
@@ -49,13 +59,13 @@ export function createManagement({db,account,save,atomic,budget,fail,json,sha,wo
     account(a.id);
     if(action==='wallet'){const amount=Number(data.amount),wallet=data.wallet;if(!['gold','bonus'].includes(wallet)||!Number.isSafeInteger(amount)||Math.abs(amount)>100000000||!reason)fail('Bakiye, tutar ve işlem nedeni gerekli');if(a[wallet]+amount<0||!Number.isSafeInteger(a[wallet]+amount))fail('Yetersiz veya geçersiz bakiye');a[wallet]+=amount;save(a);}
     if(action==='premium'){const days=Number(data.days);if(!Number.isInteger(days)||days<0||days>365)fail('Gün 0-365 olmalı');a.premiumUntil=days?Math.max(Date.now(),a.premiumUntil)+days*86400000:0;save(a);}
-    if(action==='mute'){const hours=Number(data.hours);if(a.id===p.id||!Number.isInteger(hours)||hours<0||hours>8760)fail('Susturma süresi veya hesap geçersiz');a.mutedUntil=hours?Date.now()+hours*3600000:0;save(a);}
+    if(action==='mute'&&isOwner(a)&&!isOwner(p))fail('Hesap sahibine bu işlem uygulanamaz',403);if(action==='mute'){const hours=Number(data.hours);if(a.id===p.id||!Number.isInteger(hours)||hours<0||hours>8760)fail('Susturma süresi veya hesap geçersiz');a.mutedUntil=hours?Date.now()+hours*3600000:0;save(a);}
     log(p,action,a.id,JSON.stringify({amount:data.amount,wallet:data.wallet,days:data.days,hours:data.hours,reason}));
    },p,'admin:'+action);
    
   }else if(action==='kick'){
    const peer=data.connection?[...clients()].find(ws=>ws.pid===String(data.connection)&&ws.readyState===1):connections.get(Number(data.target));
-   if(!peer)fail('Aktif bağlantı bulunamadı');
+   if(!peer)fail('Aktif bağlantı bulunamadı');if(isOwner(peer.user)&&!isOwner(p))fail('Hesap sahibi oyundan çıkarılamaz',403);
    atomic(()=>log(p,'kick',peer.user?.id||0,JSON.stringify({connection:peer.pid,room:peer.world?.room,reason})),p,'admin:kick');peer.close(1008,'Yönetici tarafından oyundan çıkarıldın');
   }else if(action==='reward'){
    const id=String(data.room||''),amount=Number(data.amount);if(!rooms.some(r=>r.id===id)||!Number.isSafeInteger(amount)||amount<1||amount>100000000||!reason)fail('Oda, 1-100.000.000 arası ödül ve işlem nedeni gerekli');
