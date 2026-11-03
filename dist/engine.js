@@ -11,6 +11,9 @@ export const isMmaRoom=id=>/^MMA-[123]$/.test(id);
 export function roomMassLimits(id){const split=id==='MMA-2'?250000:id==='MMA-3'?350000:AUTO_SPLIT_MASS;return {split,maxCell:split===AUTO_SPLIT_MASS?MAX_CELL_MASS:split,total:split*25}}
 export const ROOM_CYCLE_MS=3600000;
 export const VIRUS_RADIUS=48;
+export const VIRUS_FEED_COUNT=5;
+export const VIRUS_LAUNCH_DISTANCE=VIRUS_RADIUS*5;
+export const VIRUS_LAUNCH_MS=1200;
 export const roomMapSize=id=>id==='MMA-2'?10000:id==='MMA-3'?12000:8500;
 export function roomTiming(id,now=Date.now()){
  const index=ROOMS.findIndex(r=>r.id===id);if(index<0)throw Error('Oda bulunamadı');
@@ -40,10 +43,10 @@ export class World{
   for(const food of this.items.slice()){
    if(food.dead||food.type!=='eject')continue;
    const virus=grid.query(food.x,food.y,60).find(v=>!v.dead&&v.type==='virus'&&Math.hypot(v.x-food.x,v.y-food.y)<=VIRUS_RADIUS+8);
-   if(!virus)continue;food.dead=true;virus.fed=Math.min(7,(virus.fed||0)+1);if(virus.fed<7||count>=800)continue;
+   if(!virus)continue;food.dead=true;virus.fed=Math.min(VIRUS_FEED_COUNT,(virus.fed||0)+1);if(virus.fed<VIRUS_FEED_COUNT||count>=800)continue;
    const moving=Math.hypot(food.vx||0,food.vy||0)>.01,a=Math.atan2(moving?(food.vy||0):virus.y-food.y,moving?(food.vx||0):virus.x-food.x),distance=VIRUS_RADIUS*1.05,x=virus.x+Math.cos(a)*distance,y=virus.y+Math.sin(a)*distance;
    if(!this.virusPositionOpen(x,y,virus.id))continue;
-   this.spawn('virus',x,y,{vx:Math.cos(a)*1400,vy:Math.sin(a)*1400,shotUntil:this.time+1200});count++;virus.fed=0;
+   const travel=VIRUS_LAUNCH_DISTANCE-distance,speed=travel*3/(1-Math.exp(-3))/(VIRUS_LAUNCH_MS/1000);this.spawn('virus',x,y,{vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,shotFrom:{x,y},shotDir:{x:Math.cos(a),y:Math.sin(a)},shotTravel:travel,shotAt:this.time,shotUntil:this.time+VIRUS_LAUNCH_MS});count++;virus.fed=0;
   }
  }
 
@@ -98,7 +101,7 @@ export class World{
  center(p){let total=0,x=0,y=0;for(const c of p?.cells||[]){total+=c.mass;x+=c.x*c.mass;y+=c.y*c.mass}return{x:total?x/total:this.size/2,y:total?y/total:this.size/2,mass:total}}
  step(seconds=0.05,wallNow){const start=globalThis.performance?.now?.()||0;const dt=clamp(seconds,0.001,0.1);this.time=Number.isFinite(wallNow)?wallNow:this.time+dt*1000;this.frame++;this.events=[];
   if(this.time>=this.roundEnd){const ranked=this.ranking();this.winner=ranked[0]||null;if(this.winner){const p=this.players.get(this.winner.id);p.wins++;p[this.config.mode==='special'&&!isMmaRoom(this.room)?'bonus':'gold']+=this.prize;this.events.push({type:'round',winner:{...this.winner,skin:p.skin,color:p.color},prize:this.prize,room:this.room,round:this.round,isRecord:this.winner.score>this.finishedRecord,recordScore:Math.max(this.finishedRecord,this.winner.score)})}this.roundReplayFinal=this.winner?this.snapshot(this.winner.id,{w:10000,h:10000}):null;if(this.winner)this.finishedRecord=Math.max(this.finishedRecord,this.winner.score);this.roundRecord=false;this.prize=this.basePrize;this.round++;this.roundStart=this.time;this.roundEnd=this.time+this.config.minutes*60000;if(this.continuous){const timing=roomTiming(this.room,this.time);this.roundStart=timing.startsAt;this.roundEnd=timing.endsAt;}this.bossHealth=10000;for(const p of this.players.values())if(!p.spectator)this.respawn(p)}
-  const grid=new Grid();for(const v of this.items){if(v.until&&v.until<this.time)v.dead=true;if(v.vx||v.vy){const edge=v.type==='virus'?VIRUS_RADIUS:0;v.x=clamp(v.x+(v.vx||0)*dt,edge,this.size-edge);v.y=clamp(v.y+(v.vy||0)*dt,edge,this.size-edge);const drag=Math.pow(v.type==='virus'?.08:.04,dt);v.vx=(v.vx||0)*drag;v.vy=(v.vy||0)*drag;if(v.shotUntil&&this.time>=v.shotUntil){v.vx=0;v.vy=0}}if(!v.dead)grid.put(v)}
+  const grid=new Grid();for(const v of this.items){if(v.until&&v.until<this.time)v.dead=true;if(v.vx||v.vy){const edge=v.type==='virus'?VIRUS_RADIUS:0;if(v.type==='virus'&&v.shotFrom){const t=clamp((this.time-v.shotAt)/VIRUS_LAUNCH_MS,0,1),ease=(1-Math.exp(-3*t))/(1-Math.exp(-3));v.x=clamp(v.shotFrom.x+v.shotDir.x*v.shotTravel*ease,edge,this.size-edge);v.y=clamp(v.shotFrom.y+v.shotDir.y*v.shotTravel*ease,edge,this.size-edge);if(t>=1){v.vx=0;v.vy=0}}else{v.x=clamp(v.x+(v.vx||0)*dt,edge,this.size-edge);v.y=clamp(v.y+(v.vy||0)*dt,edge,this.size-edge);const drag=Math.pow(v.type==='virus'?.08:.04,dt);v.vx=(v.vx||0)*drag;v.vy=(v.vy||0)*drag;if(v.shotUntil&&this.time>=v.shotUntil){v.vx=0;v.vy=0}}}if(!v.dead)grid.put(v)}
   this.feedViruses(grid);
   for(const p of this.players.values()){
    if(isMmaRoom(this.room)&&this.time>=p.mmaRenewsAt){p.mmaGold=80000000;p.mmaRenewsAt+= (Math.floor((this.time-p.mmaRenewsAt)/18000000)+1)*18000000;}

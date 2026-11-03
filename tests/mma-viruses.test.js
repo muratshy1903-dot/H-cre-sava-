@@ -15,15 +15,15 @@ test('food gives ten mass and normal movement is reduced',()=>{
  const w=new World(),p=w.addPlayer('p');w.items=[];p.cells[0].x=p.cells[0].y=4250;p.aim={x:4250,y:4250};w.spawn('food',4250,4250);w.step(.05);assert.equal(p.cells[0].mass,110);
  w.items=[];p.aim={x:8000,y:4250};const x=p.cells[0].x;w.step(.1);assert.ok(p.cells[0].x-x<=25.01);
 });
-test('normal virus baseline is 80; feed creates one at seven hits with a strict 800 cap',()=>{
+test('normal virus baseline is 80; feed creates one at five hits with a strict 800 cap',()=>{
  const w=new World();assert.equal(w.items.filter(v=>v.type==='virus').length,80);w.items=[];const v=w.spawn('virus',4250,4250);
- const feed=()=>{for(let i=0;i<7;i++)w.spawn('eject',v.x-20,v.y,{vx:100,vy:0});w.step(.001)};
+ const feed=()=>{for(let i=0;i<5;i++)w.spawn('eject',v.x-20,v.y,{vx:100,vy:0});w.step(.001)};
  feed();assert.equal(w.items.filter(v=>v.type==='virus').length,2);
  w.items=[v];v.fed=0;for(let i=1;i<800;i++)w.spawn('virus',100,100);feed();assert.equal(w.items.filter(v=>v.type==='virus').length,800);
 });
 test('covered map prevents natural spawning and fed-virus multiplication',()=>{
  const w=new World(),p=w.addPlayer('p');w.items=[];p.cells=[w.cell(p,10000000,4250,4250)];assert.equal(w.replenishVirus(),false);assert.equal(w.items.length,0);
- const v=w.spawn('virus',4250,4250);for(let i=0;i<7;i++)w.spawn('eject',4230,4250,{vx:100});
+ const v=w.spawn('virus',4250,4250);for(let i=0;i<5;i++)w.spawn('eject',4230,4250,{vx:100});
  // A distant player covers the proposed child location without eating the parent.
  p.cells=[w.cell(p,100,4250+radius(150)*2+15,4250)];p.aim={...p.cells[0]};w.step(.001);assert.equal(w.items.filter(v=>v.type==='virus').length,1);
 });

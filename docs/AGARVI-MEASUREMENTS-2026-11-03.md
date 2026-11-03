@@ -20,3 +20,14 @@ The Gold change uses successful authoritative transaction receipts. Separate A/S
 Validation: `npm run check`, all 92 tests, and local browser UI inspection. The local Gold effect had separate yellow 24px deductions, the rising animation, and automatic removal. No claim that all AgarV physics now match.
 
 Publication remains blocked by the repository's RELEASING.md data-preservation requirement: the selected live Render service is Free and durable account/skin storage plus an application-consistent export were not verified. This change must not trigger the live `agarm-render` auto-deploy until those requirements are satisfied.
+
+## Follow-up measurements
+
+Subsequent manual tests in FFA-77 and FFA-76 achieved approximately 30–60 FPS during active input.
+
+- Five absorbed pellets triggered a new virus and reset the parent's visible size. This was repeated in FFA-77 and independently in FFA-76; FFA-76 count increased from 75 to 76 after the fifth individually delivered pellet. Missed pellets were excluded.
+- After the FFA-76 launch, the camera was repositioned so both settled viruses were visible together. Parent centre was approximately (535,463); child centre approximately (763,526), giving sqrt(228²+63²) = 236.5 screen pixels. Both radii were approximately 48 pixels, giving 2.46 diameters. The implementation rounds this observed ratio to 2.5 diameters (240 world units for the current radius 48). Screen pixels are not claimed to be universal world coordinates.
+- In FFA-76 a fresh-virus overlap at 268 displayed score did not burst the single cell. A preceding contact at approximately 330–350 score burst into 21 cells: a large remainder and around twenty small cells near 16 displayed score. The exact contact score was between snapshots. This bounds the minimum but does not establish an exact threshold. The existing threshold and equal-fragment algorithm therefore remain unmodified and are known outstanding mismatches.
+- The launch duration and easing were not timed accurately. The existing 1.2-second duration is retained with smooth exponential easing; only the settled distance is fitted. Natural spawning counts and the 800-virus cap remain unchanged.
+
+Changes: five-hit trigger and deterministic settled displacement independent of simulation step size. Tests cover four-versus-five hits, direction, multiple tick sizes, the final distance, and stopping. This is a partial physics match, not a claim of identical AgarV gameplay.
