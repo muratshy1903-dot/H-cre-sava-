@@ -102,3 +102,6 @@ body.light-mode #chat-messages{color:#182c3a;text-shadow:0 1px 1px #fff}.light-m
 .zirve-route h1,.zirve-route h2,.zirve-route h3{color:#edf4ff!important}.zirve-route h2{font-size:22px}.zirve-route .route-mission h3{font-size:16px}
 
 body.classic-profile-page{min-height:100dvh}
+
+/* Victory bars follow the supplied player-page reference. */
+.classic-profile-page .victory-grid{display:block!important;text-align:center;width:100%;font-size:0;line-height:0}.classic-profile-page .victory-badge{box-sizing:border-box;height:32px;min-height:32px;margin:2px .2%;padding:0 8px;border-radius:2px}.classic-profile-page .victory-badge b{font-family:Impact,"Arial Narrow",sans-serif;font-size:15px;line-height:1}.classic-profile-page .victory-badge.victory-black{width:72px!important}.classic-profile-page .profile-record-list>h2{font-size:24px;color:#222}.profile-records{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:12px}.profile-records .reference-trophy{margin:12px 0}.classic-profile-page .victory-section{padding:0 2%;width:100%;box-sizing:border-box}

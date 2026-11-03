@@ -6,5 +6,13 @@ export function createRecordAssets({db,account,fail}){
  const leader=p=>!!p?.clanId&&db.prepare('SELECT owner FROM clans WHERE id=?').get(p.clanId)?.owner===p.id;
  function edit(p,data){if(!['recordRename','recordTransfer'].includes(data.action))return null;const r=requireOwned(data.record,p);if(db.prepare("SELECT id FROM listings WHERE record_id=? AND status='active'").get(r.id))fail('Önce rekorun satış ilanını iptal et');let target=p,name=String(data.value||'').trim().slice(0,30);if(data.action==='recordRename'){if(!name||/[\x00-\x1f]/.test(name))fail('Geçerli rekor ismi gerekli')}else{target=account(Number(data.target));if(!target||target.id===p.id||target.bannedUntil>Date.now())fail('Geçerli başka bir alıcı hesap gerekli');name=target.name}if(p.gold<100000)fail('Bu işlem için 100.000 Gold gerekli');p.gold-=100000;db.prepare('INSERT INTO record_assets(record_id,owner,display_name) VALUES(?,?,?) ON CONFLICT(record_id) DO UPDATE SET owner=excluded.owner,display_name=excluded.display_name').run(r.id,target.id,name);return {recordId:r.id,cost:100000}}
  function display(room,record){if(!record)return null;const row=db.prepare('SELECT id FROM records WHERE room=? AND score=? ORDER BY id LIMIT 1').get(room,record.score);const asset=row?owned(row.id):null;return {...record,id:row?.id||null,name:asset?.display_name||record.name,owner:asset?.owner||null}}
- return {owned,isCurrent,requireOwned,leader,edit,display};
+ function currentForOwner(p){
+  if(!p)return [];
+  return db.prepare('SELECT room FROM room_records UNION SELECT room FROM records').all().map(({room})=>{
+   const saved=db.prepare('SELECT * FROM room_records WHERE room=?').get(room),best=db.prepare('SELECT * FROM records WHERE room=? ORDER BY score DESC,id ASC LIMIT 1').get(room);
+   const record=display(room,saved&&saved.score>=(best?.score||0)?saved:best);
+   return record?.owner===p.id?record:null;
+  }).filter(Boolean).sort((a,b)=>b.score-a.score||a.room.localeCompare(b.room,'tr'));
+ }
+ return {owned,isCurrent,requireOwned,leader,edit,display,currentForOwner};
 }

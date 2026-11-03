@@ -19,10 +19,10 @@ test('record rename/transfer charge 100k atomically, only clan leaders buy, bann
   await wait(watch,m=>m.type==='state'&&m.lastRound?.room==='FFA-1',()=>manage({action:'finishRoom',room:'FFA-1'}));const record=(await call('market',null,a.cookie)).body.ownRecords[0];assert.ok(record);
   await manage({action:'wallet',target:a.body.user.id,wallet:'gold',amount:400000,reason:'test fees'});const balance=(await call('me',null,a.cookie)).body.user.gold;
   assert.equal((await act(a,'recordRename',{record:record.id,value:'Yeni isim'})).status,200);assert.equal((await call('me',null,a.cookie)).body.user.gold,balance-100000);
-  let state=await wait(player,m=>m.type==='state'&&m.roomRecord?.name==='Yeni isim');assert.equal(state.roomRecord.owner,a.body.user.id);
+  let state=await wait(player,m=>m.type==='state'&&m.roomRecord?.name==='Yeni isim');assert.equal(state.roomRecord.owner,a.body.user.id);assert.equal((await call('profile-records',null,a.cookie)).body[0].owner,a.body.user.id);
   assert.equal((await act(a,'recordTransfer',{record:record.id,target:999999})).status,400);assert.equal((await call('me',null,a.cookie)).body.user.gold,balance-100000);
   assert.equal((await act(a,'recordTransfer',{record:record.id,target:b.body.user.id})).status,200);assert.equal((await call('me',null,a.cookie)).body.user.gold,balance-200000);assert.equal((await act(a,'recordRename',{record:record.id,value:'Denied'})).status,400);
-  await wait(player,m=>m.type==='state'&&m.roomRecord?.owner===b.body.user.id);
+  await wait(player,m=>m.type==='state'&&m.roomRecord?.owner===b.body.user.id);assert.equal((await call('profile-records',null,a.cookie)).body.length,0);assert.equal((await call('profile-records',null,b.cookie)).body[0].id,record.id);
   assert.equal((await act(b,'marketList',{kind:'record',record:record.id,price:7777})).status,200);const listing=(await call('market')).body.listings[0];assert.equal((await act(a,'marketBuy',{target:listing.id})).status,400);
   await manage({action:'wallet',target:admin.body.user.id,wallet:'bonus',amount:250000,reason:'test clan'});assert.equal((await act(admin,'clanCreate',{value:'Leader clan'})).status,200);assert.equal((await act(admin,'marketBuy',{target:listing.id})).status,200);
   await wait(player,m=>m.type==='state'&&m.roomRecord?.owner===admin.body.user.id);
