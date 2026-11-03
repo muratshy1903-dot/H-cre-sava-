@@ -31,3 +31,7 @@ Subsequent manual tests in FFA-77 and FFA-76 achieved approximately 30–60 FPS 
 - The launch duration and easing were not timed accurately. The existing 1.2-second duration is retained with smooth exponential easing; only the settled distance is fitted. Natural spawning counts and the 800-virus cap remain unchanged.
 
 Changes: five-hit trigger and deterministic settled displacement independent of simulation step size. Tests cover four-versus-five hits, direction, multiple tick sizes, the final distance, and stopping. This is a partial physics match, not a claim of identical AgarV gameplay.
+
+## User-selected burst threshold
+
+The user explicitly selected **335** on 3 November 2026. The collision eligibility check and direct burst guard now share VIRUS_BURST_MASS = 335, inclusive. It applies per cell, using mass at contact before any virus reward. This is the requested gameplay setting, not a claim that the exact AgarV threshold was measured. Previous notes about leaving the threshold unchanged describe the earlier version; fragment distribution remains outstanding.
