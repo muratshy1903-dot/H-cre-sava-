@@ -1,3 +1,4 @@
+import {rewardSkinInfo} from './reward-skins.js';
 export const SKIN_CATALOG=[
   {
     "id": "agarm1",
@@ -474,4 +475,4 @@ export const SKIN_CATALOG=[
 ];
 const skinById=new Map(SKIN_CATALOG.map(s=>[s.id,s]));
 export function catalogSkin(id){id=String(id);if(/^agarz\d+$/.test(id))id=id.replace(/^agarz/,'agarm');if(skinById.has(id))return skinById.get(id);const n=Number(id.slice(4));if(!/^skin([1-9]|[1-6][0-9]|7[0-2])$/.test(id))return null;return SKIN_CATALOG[(n-1)%SKIN_CATALOG.length]}
-export function skinImageUrl(id){return /^custom-[a-f0-9]{24}$/.test(String(id))?'/skins/'+id.slice(7)+'.webp':catalogSkin(id)?.image||null}
+export function skinImageUrl(id){return /^custom-[a-f0-9]{24}$/.test(String(id))?'/skins/'+id.slice(7)+'.webp':catalogSkin(id)?.image||rewardSkinInfo(id)?.image||null}

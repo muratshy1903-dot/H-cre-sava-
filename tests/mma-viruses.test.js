@@ -8,7 +8,7 @@ test('MMA wallet refills exactly at five hours and survives room changes without
  assert.equal(mmaWallet(restored,end-1).balance,42);assert.equal(mmaWallet(restored,end).balance,MMA_GOLD);
  restored.mmaWallet.balance=1;assert.equal(mmaWallet(restored,end+3*MMA_RENEW_MS).balance,MMA_GOLD);assert.ok(restored.mmaWallet.renewsAt>end+3*MMA_RENEW_MS);
  const w=new World('MMA-1',{now}),p=w.addPlayer('p',{gold:123,bonus:456});w.items=[];w.gold(p,'big');assert.equal(p.mmaGold,MMA_GOLD-100);assert.equal(p.gold,123);assert.equal(p.bonus,456);assert.equal(w.prize,50000);
- w.step(.05,now+MMA_RENEW_MS);assert.equal(p.mmaGold,MMA_GOLD);assert.equal(p.gold,123);assert.equal(p.bonus,456);
+ w.step(.05,now+MMA_RENEW_MS);assert.equal(p.mmaGold,MMA_GOLD);assert.equal(p.gold,50123);assert.equal(p.bonus,456);
  assert.ok(ROOMS.some(r=>r.id==='MMA-1'));assert.ok(!ROOMS.some(r=>r.id==='SPVS-1'));
 });
 test('food gives ten mass and normal movement is reduced',()=>{

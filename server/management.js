@@ -76,6 +76,7 @@ export function createManagement({db,account,save,atomic,budget,fail,json,sha,wo
    if(!peer)fail('Aktif bağlantı bulunamadı');if(isOwner(peer.user)&&!isOwner(p))fail('Hesap sahibi oyundan çıkarılamaz',403);
    atomic(()=>log(p,'kick',peer.user?.id||0,JSON.stringify({connection:peer.pid,room:peer.world?.room,reason})),p,'admin:kick');peer.close(1008,'Yönetici tarafından oyundan çıkarıldın');
   }else if(action==='reward'){
+   if(/^MMA-[123]$/.test(String(data.room||'')))fail('MMA ödülü aktif oyuncu sayısına göre otomatik hesaplanır');
    const id=String(data.room||''),amount=Number(data.amount);if(!rooms.some(r=>r.id===id)||!Number.isSafeInteger(amount)||amount<1||amount>100000000||!reason)fail('Oda, 1-100.000.000 arası ödül ve işlem nedeni gerekli');
    const w=worldFor(id);if(w.prize+amount>1000000000)fail('Oda ödül sınırı');
    atomic(()=>{db.prepare('INSERT INTO room_pools(room,round_end,prize) VALUES(?,?,?) ON CONFLICT(room) DO UPDATE SET round_end=excluded.round_end,prize=excluded.prize').run(w.room,w.roundEnd,Math.floor(w.prize+amount));log(p,'reward',0,JSON.stringify({room:id,amount,reason}));},p,'admin:reward');w.prize+=amount;result={ok:true,prize:w.prize};

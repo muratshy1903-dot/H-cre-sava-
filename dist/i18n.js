@@ -1,6 +1,38 @@
 export const LANGUAGES={tr:{name:'Türkçe',flag:'🇹🇷',locale:'tr-TR'},en:{name:'English',flag:'🇬🇧',locale:'en-GB'},es:{name:'Español',flag:'🇪🇸',locale:'es-ES'},de:{name:'Deutsch',flag:'🇩🇪',locale:'de-DE'},ru:{name:'Русский',flag:'🇷🇺',locale:'ru-RU'}};
 // UI copy only. Player names, chat messages, entered form values and room IDs are never translated.
 const rows=[
+["Zirve Yolu", "Summit Path", "Camino a la cima", "Gipfelpfad", "Путь к вершине"],
+["ZİRVE", "SUMMIT", "CAMINO", "GIPFEL", "ПУТЬ"],
+["YOLU", "PATH", "A LA CIMA", "PFAD", "К ВЕРШИНЕ"],
+["Avcı", "Hunter", "Cazador", "Jäger", "Охотник"],
+["Şampiyon", "Champion", "Campeón", "Champion", "Чемпион"],
+["Tarzını seç. Görevleri tamamla. Ödülüne sen karar ver.", "Choose your style. Complete missions. Pick your rewards.", "Elige tu estilo. Completa misiones. Elige tus recompensas.", "Wähle deinen Stil. Erfülle Aufgaben. Wähle deine Belohnungen.", "Выберите стиль. Выполняйте задания. Выбирайте награды."],
+["Üç yoldan biri seni bekliyor", "Three paths await you", "Te esperan tres caminos", "Drei Pfade warten auf dich", "Вас ждут три пути"],
+["Sezon biletini aç", "Unlock season ticket", "Activar pase de temporada", "Saisonticket freischalten", "Открыть сезонный пропуск"],
+["✓ Bu sezonun bileti açık", "✓ Season ticket active", "✓ Pase de temporada activo", "✓ Saisonticket aktiv", "✓ Сезонный пропуск активен"],
+["Seçtiğin yol sezon boyunca sabit kalır. Eski koleksiyonun korunur.", "Your path is fixed for this season. Your previous collection stays yours.", "Tu camino queda fijo durante la temporada. Conservas tu colección anterior.", "Dein Pfad bleibt diese Saison fest. Deine bisherige Sammlung bleibt erhalten.", "Путь закрепляется на сезон. Ваша прежняя коллекция сохраняется."],
+["Yem topla, rakip yen ve skorunu büyüt.", "Collect food, defeat rivals and grow your score.", "Recoge comida, derrota rivales y aumenta tu puntuación.", "Sammle Nahrung, besiege Gegner und erhöhe deine Punkte.", "Собирайте еду, побеждайте соперников и увеличивайте счёт."],
+["Oda kazan, MMA’da birinci ol ve zirveye çık.", "Win rooms, finish first in MMA and reach the top.", "Gana salas, vence en MMA y llega a la cima.", "Gewinne Räume, siege im MMA und erreiche die Spitze.", "Побеждайте в комнатах и MMA, поднимайтесь на вершину."],
+["Klanınla oyna, tur kazan ve birlikte ilerle.", "Play with your clan, win rounds and progress together.", "Juega con tu clan, gana rondas y avanzad juntos.", "Spiele mit deinem Clan, gewinne Runden und kommt gemeinsam voran.", "Играйте с кланом, выигрывайте раунды и развивайтесь вместе."],
+["Bu yolu seç", "Choose this path", "Elegir este camino", "Diesen Pfad wählen", "Выбрать этот путь"],
+["✓ Seçili yol", "✓ Selected path", "✓ Camino elegido", "✓ Gewählter Pfad", "✓ Выбранный путь"],
+["Diğer sezon", "Next season", "Próxima temporada", "Nächste Saison", "В следующем сезоне"],
+["20 kademe, sana ait bir yol", "20 tiers, your own path", "20 niveles, tu propio camino", "20 Stufen, dein eigener Pfad", "20 уровней, ваш собственный путь"],
+["Her beş kademede Gold, Premium veya özel sezon skini arasından seçim yap. Son kademede sezon numaralı kalıcı unvanını kazan.", "Every fifth tier, choose Gold, Premium or a season skin. Earn a permanent numbered season title at the final tier.", "Cada cinco niveles elige Gold, Premium o un skin de temporada. El último nivel otorga un título permanente numerado.", "Wähle alle fünf Stufen Gold, Premium oder einen Saison-Skin. Die letzte Stufe gibt einen dauerhaften nummerierten Saisontitel.", "Каждые пять уровней выбирайте Gold, Premium или сезонный скин. На последнем уровне получите постоянный титул с номером сезона."],
+["Üç ödülden birini seç", "Choose one of three rewards", "Elige una de tres recompensas", "Wähle eine von drei Belohnungen", "Выберите одну из трёх наград"],
+["Seçim kaydedildi", "Choice saved", "Elección guardada", "Auswahl gespeichert", "Выбор сохранён"],
+["Kalıcı koleksiyonum", "My permanent collection", "Mi colección permanente", "Meine dauerhafte Sammlung", "Моя постоянная коллекция"],
+["Sezon sıralaması", "Season standings", "Clasificación de temporada", "Saisonrangliste", "Рейтинг сезона"],
+["Kalıcı unvan", "Permanent title", "Título permanente", "Dauerhafter Titel", "Постоянный титул"],
+["KAZANILDI", "EARNED", "OBTENIDO", "VERDIENT", "ПОЛУЧЕНО"],
+["yem topla", "Collect {n} food", "Recoge {n} alimentos", "Sammle {n} Nahrung", "Соберите {n} еды"],
+["rakip yen", "Defeat {n} rivals", "Derrota a {n} rivales", "Besiege {n} Gegner", "Победите {n} соперников"],
+["skora ulaş", "Reach {n} score", "Alcanza {n} puntos", "Erreiche {n} Punkte", "Наберите {n} очков"],
+["saniye oyna", "Play for {n} seconds", "Juega {n} segundos", "Spiele {n} Sekunden", "Играйте {n} секунд"],
+["tur kazan", "Win {n} rounds", "Gana {n} rondas", "Gewinne {n} Runden", "Выиграйте {n} раундов"],
+["MMA turu kazan", "Win {n} MMA rounds", "Gana {n} rondas MMA", "Gewinne {n} MMA-Runden", "Выиграйте {n} раундов MMA"],
+["saniye klan üyesiyken oyna", "Play {n} seconds as a clan member", "Juega {n} segundos como miembro de un clan", "Spiele {n} Sekunden als Clanmitglied", "Играйте {n} секунд в составе клана"],
+["klan üyesiyken tur kazan", "Win {n} rounds as a clan member", "Gana {n} rondas como miembro de un clan", "Gewinne {n} Runden als Clanmitglied", "Выиграйте {n} раундов в составе клана"],
 ['Oyna','Play','Jugar','Spielen','Играть'],['İzle','Spectate','Observar','Zuschauen','Наблюдать'],['Tekrar','Replay','Repetición','Wiederholung','Повтор'],['Skin Galerisi','Skin Gallery','Galería de skins','Skin-Galerie','Галерея скинов'],
 ['Skin Göster','Show Skins','Mostrar skins','Skins anzeigen','Показывать скины'],['İsim Göster','Show Names','Mostrar nombres','Namen anzeigen','Показывать имена'],['Karanlık','Dark Mode','Modo oscuro','Dunkelmodus','Тёмная тема'],['Saydam','Transparent','Transparente','Transparent','Прозрачность'],['Skor Göster','Show Score','Mostrar puntuación','Punkte anzeigen','Показывать счёт'],['Basit Yeşil','Simple Viruses','Virus simples','Einfache Viren','Простые вирусы'],['Makro','Macro','Macro','Makro','Макрос'],['Etrafı Göster','Show Surroundings','Mostrar entorno','Umgebung anzeigen','Показывать окружение'],['Bilgileri Göster','Show Information','Mostrar información','Informationen anzeigen','Показывать информацию'],['Sohbet gizle','Hide Chat','Ocultar chat','Chat ausblenden','Скрыть чат'],['Kenar','Borders','Bordes','Ränder','Границы'],['Klan','Clan','Clan','Clan','Клан'],['Sürekli Oyna','Auto Respawn','Reaparición automática','Automatisch wieder starten','Автовозрождение'],['Hızlı Görünüm','Fast Rendering','Renderizado rápido','Schnelle Darstellung','Быстрая отрисовка'],['Sohbette Hesap No','Account ID in Chat','ID de cuenta en el chat','Konto-ID im Chat','Номер аккаунта в чате'],['Tam Ekran','Full Screen','Pantalla completa','Vollbild','Полный экран'],
 ['Oyuncu ismi','Player Name','Nombre del jugador','Spielername','Имя игрока'],['İsim','Name','Nombre','Name','Имя'],['Takım','Team','Equipo','Team','Команда'],['Takım etiketi','Team Tag','Etiqueta del equipo','Team-Kürzel','Метка команды'],['Oda seçimi','Room Selection','Elegir sala','Raumauswahl','Выбор комнаты'],['ODA','ROOM','SALA','RAUM','КОМНАТА'],['OYUNA KATIL','JOIN THE GAME','UNIRSE AL JUEGO','SPIEL BEITRETEN','ПРИСОЕДИНИТЬСЯ'],['GÖRÜNÜM & KONTROLLER','DISPLAY & CONTROLS','PANTALLA Y CONTROLES','ANZEIGE & STEUERUNG','ВИД И УПРАВЛЕНИЕ'],['BÜYÜ. BÖLÜN. ZİRVEYE ÇIK.','GROW. SPLIT. REACH THE TOP.','CRECE. DIVÍDETE. LLEGA A LA CIMA.','WACHSEN. TEILEN. SPITZE ERREICHEN.','РАСТИ. ДЕЛИСЬ. СТАНЬ ЛИДЕРОМ.'],
@@ -49,6 +81,10 @@ export function translateText(text,lang='tr'){
  if(lang==='tr'||!dictionaries[lang])return text;
  const leading=text.match(/^\s*/)[0],trailing=text.match(/\s*$/)[0],value=text.trim(),dict=dictionaries[lang];if(!value)return text;
  const exact=dict.get(value);if(exact)return leading+exact+trailing;
+ const mission=value.match(/^([\d.,]+) (yem topla|rakip yen|skora ulaş|saniye oyna|tur kazan|MMA turu kazan|saniye klan üyesiyken oyna|klan üyesiyken tur kazan)$/);if(mission&&dict.has(mission[2]))return leading+dict.get(mission[2]).replace('{n}',mission[1])+trailing;
+ const path=value.match(/^(Avcı|Şampiyon|Klan) Yolu$/);if(path)return leading+dict.get(path[1])+' '+({en:'Path',es:'Camino',de:'Pfad',ru:'Путь'})[lang]+trailing;
+ const countdown=value.match(/^(\d+)\. Sezon · (\d+) gün (\d\d:\d\d:\d\d)$/);if(countdown)return leading+countdown[1]+'. '+({en:'Season',es:'Temporada',de:'Saison',ru:'Сезон'})[lang]+' · '+countdown[2]+' '+({en:'days',es:'días',de:'Tage',ru:'дней'})[lang]+' '+countdown[3]+trailing;
+ const tier=value.match(/^(\d+) \/ 20 kademe$/);if(tier)return leading+tier[1]+' / 20 '+({en:'tiers',es:'niveles',de:'Stufen',ru:'уровней'})[lang]+trailing;
  const count=value.match(/^(\d+) ücretsiz skin\. Kendi skinini yüklemek her seferinde 10\.000 Gold; özel skinini yalnızca sen kullanabilirsin\.$/);if(count)return leading+({en:`${count[1]} free skins. Each custom upload costs 10,000 Gold; only you can use your private skin.`,es:`${count[1]} skins gratis. Cada carga privada cuesta 10.000 Gold y solo tú puedes usarla.`,de:`${count[1]} kostenlose Skins. Jeder eigene Upload kostet 10.000 Gold; nur du kannst ihn verwenden.`,ru:`${count[1]} бесплатных скинов. Своя загрузка стоит 10 000 Gold; скин доступен только вам.`})[lang]+trailing;
  const registered=value.match(/^Kayıtlı Skinler \((\d+)\)$/);if(registered)return leading+dict.get('Kayıtlı Skinler')+' ('+registered[1]+')'+trailing;
  const arrow=value.match(/^(.*?)\s*([↗→←])$/);if(arrow&&dict.has(arrow[1]))return leading+dict.get(arrow[1])+' '+arrow[2]+trailing;
@@ -64,7 +100,7 @@ export function translateText(text,lang='tr'){
 export function initLanguages(){
  let language='tr';try{const saved=localStorage.getItem('agarm_language');if(LANGUAGES[saved])language=saved}catch{}
  const originals=new WeakMap(),attributeSources=new WeakMap();let observer;
- const skip='script,style,textarea,#chat-messages,#leaders,.avatar,.account-top strong,.skin-card small,[data-player],[data-spectate],[data-no-translate],[data-language]';
+ const skip='script,style,textarea,#chat-messages,#leaders,#owned-room-record,#room-record,#room-winner,#season-entry,#admin-announcement,.avatar,.account-top strong,.skin-card small,[data-player],[data-spectate],[data-no-translate],[data-language]';
  function translateNode(node){if(node.nodeType===3){if(!node.parentElement||node.parentElement.closest(skip))return;let entry=originals.get(node);if(!entry||node.nodeValue!==entry.output)entry={source:node.nodeValue};const output=translateText(entry.source,language);entry.output=output;originals.set(node,entry);if(node.nodeValue!==output)node.nodeValue=output;return}if(node.nodeType!==1||node.matches('script,style'))return;
   if(!node.closest(skip))for(const name of ['placeholder','aria-label','title'])if(node.hasAttribute(name)){let entries=attributeSources.get(node)||{},entry=entries[name];const value=node.getAttribute(name);if(!entry||entry.output!==value)entry={source:value};entry.output=translateText(entry.source,language);entries[name]=entry;attributeSources.set(node,entries);if(value!==entry.output)node.setAttribute(name,entry.output);}
   for(const child of node.childNodes)translateNode(child);

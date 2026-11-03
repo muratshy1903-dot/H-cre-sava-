@@ -1,8 +1,8 @@
-export const PASS_NAME='ZirvePass';
+export const PASS_NAME='Zirve Yolu';
 export const PASS_PRICE=5000000;
 export const SEASON_ANCHOR=Date.parse('2026-10-29T21:00:00Z');
 export const SEASON_LENGTH=30*86400000;
-export const COSMETIC_TYPES={nick:'Nick stili',title:'Unvan',entry:'Odaya giriş',border:'Hücre kenarı',theme:'Sayfa teması'};
+export const COSMETIC_TYPES={nick:'Nick stili',title:'Unvan',entry:'Odaya giriş',border:'Hücre kenarı',theme:'Sayfa teması',skin:'Sezon skini'};
 export const SEASON_QUESTS=[
  {id:'season-food',metric:'food',name:'10.000 yem topla',target:10000,xp:1000},
  {id:'season-kills',metric:'kills',name:'100 rakip yen',target:100,xp:1000},
@@ -29,7 +29,7 @@ export function seasonState(p,now=Date.now()){
  return p.season;
 }
 export function seasonProgress(p,delta,now=Date.now()){
- const s=seasonState(p,now);for(const key of ['food','kills','seconds','goldSpent','games','wins'])s.stats[key]=(s.stats[key]||0)+Math.max(0,Number(delta[key])||0);
+ const s=seasonState(p,now);for(const key of ['food','kills','seconds','goldSpent','games','wins'])s.stats[key]=(s.stats[key]||0)+Math.max(0,Number(delta[key])||0);for(const key of ['mmaWins','clanWins','clanSeconds'])s.stats[key]=(s.stats[key]||0)+Math.max(0,Number(delta[key])||0);s.stats.bestScore=Math.max(s.stats.bestScore||0,Number(delta.bestScore)||0);
 }
 export function passXP(p,n,now=Date.now()){const s=seasonState(p,now);if(!Number.isFinite(n)||n<0)throw Error('Geçersiz XP');s.xp+=n;}
 export const levelForXP=xp=>Math.min(30,Math.max(0,Math.floor(xp/200)));
