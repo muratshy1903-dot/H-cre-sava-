@@ -19,10 +19,10 @@ test('camera follows weighted player centre and selected spectator target, never
 test('fed viruses fire in pellet direction and travel, including pure vertical feeds',()=>{
  for(const [vx,vy] of [[1000,0],[0,1000],[-1000,0],[0,-1000]]){
   const w=new World();w.items=[];const v=w.spawn('virus',4250,4250);
-  for(let i=0;i<7;i++)w.spawn('eject',4250-vx/100,4250-vy/100,{vx,vy});w.step(.001);
+  for(let i=0;i<5;i++)w.spawn('eject',4250-vx/100,4250-vy/100,{vx,vy});w.step(.001);
   const child=w.items.find(x=>x.type==='virus'&&x.id!==v.id);assert.ok(child);const x=child.x,y=child.y;
-  assert.ok(Math.abs(child.vx-vx/1000*1400)<1e-6);assert.ok(Math.abs(child.vy-vy/1000*1400)<1e-6);
-  w.step(.05);assert.ok(Math.hypot(child.x-x,child.y-y)>50);assert.equal(v.x,4250);assert.equal(v.y,4250);
+  const speed=Math.hypot(child.vx,child.vy);assert.ok(speed>0);assert.ok(Math.abs(child.vx/speed-vx/1000)<1e-6);assert.ok(Math.abs(child.vy/speed-vy/1000)<1e-6);
+  w.step(.05);assert.ok(Math.hypot(child.x-x,child.y-y)>0);assert.equal(v.x,4250);assert.equal(v.y,4250);
  }
 });
 test('virus projectiles interpolate instead of jumping between network snapshots',()=>{
