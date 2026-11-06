@@ -1,0 +1,10 @@
+import {startServer} from '../server/index.js';
+const args=process.argv.slice(2);
+const value=key=>args[args.indexOf(key)+1];
+const port=args.includes('--port')?Number(value('--port')):Number(process.env.PORT)||3000;
+const host=args.includes('--host')?value('--host'):process.env.HOST||'127.0.0.1';
+if(!Number.isInteger(port)||port<1||port>65535)throw Error('Geçersiz önizleme portu');
+const server=startServer({port,host});
+server.once('error',error=>{console.error(error.message);process.exitCode=1;});
+const stop=()=>{server.shutdown(()=>process.exit(0));setTimeout(()=>process.exit(1),5000).unref();};
+process.once('SIGINT',stop);process.once('SIGTERM',stop);

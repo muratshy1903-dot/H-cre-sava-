@@ -1,3 +1,4 @@
+import {createCrystalGame} from './crystal-game.js';
 import {chooseZirvePath,activateZirve,claimZirve,zirveEntry} from '../dist/zirve-yolu.js';
 import {ownsRewardSkin} from '../dist/reward-skins.js';
 import {createSeasonChampions} from './season-champions.js';
@@ -70,6 +71,7 @@ for(const table of ['records','room_pools','room_settings','room_history','room_
  if(table==='room_controls'){const row=db.prepare('SELECT definition FROM room_controls WHERE room=?').get('MMA-1');if(row){const def=JSON.parse(row.definition);def.id='MMA-1';db.prepare('UPDATE room_controls SET definition=? WHERE room=?').run(JSON.stringify(def),'MMA-1');}}
 }
 const management=createManagement({db,account,save,atomic,budget,fail,json,sha,worlds,worldFor,connections,rooms:ROOMS,roomTiming,clients:()=>liveClients,canManage,isOwner,hasPermission,permissionsFor});
+const crystalGame=createCrystalGame({db,atomic,save,spend,fail,json,mePublic});
 const results=createRoomResults(db);
 const seasonChampions=createSeasonChampions(db);seasonChampions.sync();
 function snapshotFor(w,id,view){return {...w.snapshot(id,view),lastRound:results.latest,recordNotice:results.recordNotice(),seasonEntry:w.seasonEntry||null,season:seasonMeta(w.time),adminAnnouncement:management.announcement,roomRecord:features.recordDisplay(w.room,results.record(w.room)),roomWinner:results.winner(w.room)}}
@@ -82,6 +84,7 @@ const gameReset=createGameReset({db,dataDir:DATA,fail,json,budget,scrypt,sha,isO
 const api=async(req,res,url)=>{
  const generation=resetGeneration,p=session(req);let data;const assertGeneration=()=>{if(generation!==resetGeneration)fail('Oyun sıfırlandı. Sayfayı yenileyip tekrar giriş yap.',409)};
  if(req.method==='POST'){const expected=process.env.PUBLIC_ORIGIN||`${req.headers['x-forwarded-proto']||'http'}://${req.headers.host}`;if(req.headers.origin&&req.headers.origin!==expected)fail('Geçersiz kaynak',403);budget(req,'api',100);data=await body(req);assertGeneration()}
+ if(crystalGame.route(req,res,url,p,data))return;
  if(await gameReset.route(req,res,url,p,data))return;
  if(await management.route(req,res,url,p,data))return;
  if(await features.route(req,res,url,p,data))return;
