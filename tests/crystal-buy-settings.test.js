@@ -3,10 +3,12 @@ test('bonus purchases charge once, RTP edits require a dedicated permission and 
  const dir=await mkdtemp(path.join(os.tmpdir(),'agarm-crystal-buy-'));process.env.AGARM_DATA=dir;
  const {startServer,grantAdmin}=await import('../server/index.js');const server=startServer({port:0});await once(server,'listening');const base='http://127.0.0.1:'+server.address().port,db=new DatabaseSync(path.join(dir,'agarm.sqlite'));
  const seed=(name,gold=1000000000,permissions=[])=>{const p={name,gold,bonus:gold,wins:0,xp:0,premiumUntil:0,inventory:[],skins:[],claimed:[],names:[],favorites:[],following:[],settings:{},panelPermissions:permissions};const id=Number(db.prepare('INSERT INTO accounts(email,hash,salt,profile) VALUES(?,?,?,?)').run(name+'@buy.test','00'.repeat(64),'fixture',JSON.stringify(p)).lastInsertRowid),token=crypto.randomBytes(32).toString('hex');db.prepare('INSERT INTO sessions VALUES(?,?,?)').run(crypto.createHash('sha256').update(token).digest('hex'),id,Date.now()+60000);return{id,cookie:'agarm_session='+token};};
- const owner=seed('owner'),player=seed('player'),other=seed('other'),poor=seed('poor',100),economy=seed('rtp-manager',100,['crystalRtp']),walletOnly=seed('wallet-only',100,['economy']),chat=seed('chat',100,['chat']);grantAdmin('owner@buy.test');
+ const owner=seed('owner'),player=seed('player'),other=seed('other'),poor=seed('poor',100),economy=seed('rtp-manager',100,['crystalRtp']),walletOnly=seed('wallet-only',100,['economy']),chat=seed('chat',100,['chat']),winManager=seed('win-manager',100,['crystalWinChance']);grantAdmin('owner@buy.test');
  const call=async(route,data,who=player)=>{const r=await fetch(base+'/api/'+route,{method:data?'POST':'GET',headers:{Origin:base,Cookie:who.cookie,'content-type':'application/json'},body:data?JSON.stringify(data):undefined});return{status:r.status,body:await r.json()};};
  try{
-  assert.equal((await call('crystal')).body.settings.targetRtp,99.99);
+  assert.equal((await call('crystal')).body.settings.targetRtp,99.99);assert.equal((await call('crystal')).body.settings.winChance,99.99);assert.equal((await call('crystal')).body.settings.winControlEnabled,true);
+  assert.equal((await call('crystal/settings',{winChance:50,winControlEnabled:true,revision:1},economy)).status,403);
+  assert.equal((await call('crystal/settings',{targetRtp:10,revision:1},winManager)).status,403);
   assert.equal((await call('crystal/settings')).status,403);assert.equal((await call('crystal/settings',null,walletOnly)).status,403);assert.equal((await call('crystal/settings',{targetRtp:50,revision:1},walletOnly)).status,403);assert.equal((await call('crystal/settings',null,chat)).status,403);assert.equal((await call('crystal/settings',null,economy)).status,200);
   const buy={kind:'buy',wallet:'gold',bet:5000000,requestId:'buy-feature-request-001',settingsRevision:1};
   const both=await Promise.all([call('crystal',buy),call('crystal',buy)]);assert.deepEqual(both.map(r=>r.status),[200,200]);assert.deepEqual(both[0].body.round,both[1].body.round);
@@ -26,6 +28,13 @@ test('bonus purchases charge once, RTP edits require a dedicated permission and 
   const fresh=seed('fresh');const spin={kind:'spin',wallet:'gold',bet:100,requestId:'new-settings-spin-001',settingsRevision:1};assert.equal((await call('crystal',spin,fresh)).status,409);
   const valid=await call('crystal',{...spin,settingsRevision:2,math:{targetRtp:200}},fresh);assert.equal(valid.status,200);assert.equal(valid.body.round.math.targetRtp,88.88);
   assert.equal(db.prepare('SELECT target_bps FROM crystal_settings').get().target_bps,8888);
-  db.prepare('DELETE FROM crystal_settings').run();assert.equal((await call('crystal')).body.settings.targetRtp,99.99);
+  for(const winChance of [-1,100.01,99.999,'99.99',null])assert.equal((await call('crystal/settings',{winChance,winControlEnabled:true,revision:2},winManager)).status,400);
+  const winChanged=await call('crystal/settings',{winChance:100,winControlEnabled:true,revision:2},winManager);assert.equal(winChanged.status,200);assert.equal(winChanged.body.settings.targetRtp,88.88);assert.equal(winChanged.body.settings.winChance,100);
+  assert.equal((await call('crystal/settings',{winChance:0,winControlEnabled:false,revision:2},winManager)).status,409);
+  assert.equal(db.prepare('SELECT count(*) n FROM audit WHERE action=?').get('crystalWinChance').n,1);
+  assert.equal(Object.hasOwn((await call('crystal')).body.bonus||{},'plan'),false);
+  db.prepare('DELETE FROM crystal_settings').run();assert.equal((await call('crystal')).body.settings.targetRtp,99.99);assert.equal((await call('crystal')).body.settings.winChance,99.99);assert.equal((await call('crystal')).body.settings.winControlEnabled,true);
+  assert.equal((await call('crystal/settings',{winChance:50,winControlEnabled:true,revision:1},economy)).status,403);
+  assert.equal((await call('crystal/settings',{targetRtp:10,revision:1},winManager)).status,403);
  }finally{await new Promise(resolve=>server.shutdown(resolve));db.close();await rm(dir,{recursive:true,force:true});}
 });

@@ -24,7 +24,7 @@ for(let i=1;i<=trials;i++){
   const x=total/(bet*(mode==='buy'?100:1)),delta=x-mean;mean+=delta/i;m2+=delta*(x-mean);maxWin=Math.max(maxWin,x);
 }
 const se=Math.sqrt(m2/(trials-1)/trials)*100;
-const report={rulesVersion:CRYSTAL_RULES.version,mode,targetRtp,rounds:trials,bet,seed,payScale:math.payScale,scatterScale:math.scatterScale,measuredRtp:mean*100,ci95:[mean*100-1.96*se,mean*100+1.96*se],standardError:se,freeSpins,triggers,caps,maxWin,maxTumbles,scatterRtp:scatterPaid/(trials*bet*(mode==='buy'?100:1))*100};
+const report={scope:'base-game-without-win-support',rulesVersion:CRYSTAL_RULES.version,mode,targetRtp,rounds:trials,bet,seed,payScale:math.payScale,scatterScale:math.scatterScale,measuredRtp:mean*100,ci95:[mean*100-1.96*se,mean*100+1.96*se],standardError:se,freeSpins,triggers,caps,maxWin,maxTumbles,scatterRtp:scatterPaid/(trials*bet*(mode==='buy'?100:1))*100};
 if(samples){
   samples.sort();const prefix=new Float64Array(trials+1);for(let i=0;i<trials;i++)prefix[i+1]=prefix[i]+samples[i];
   const expected=scale=>{let lo=0,hi=trials;const threshold=5000/scale;while(lo<hi){const mid=(lo+hi)>>>1;if(samples[mid]<threshold)lo=mid+1;else hi=mid;}return(prefix[lo]*scale+(trials-lo)*5000)/trials;};
