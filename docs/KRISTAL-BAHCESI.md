@@ -1,4 +1,6 @@
-# Kristal Bahçesi — 1.17.0 / matematik sürümü 3
+# Kristal Bahçesi — 1.18.0 / matematik sürümü 4
+
+**Bu sürümde kazanma desteği varsayılan olarak açıktır. Aşağıdaki temel RTP ölçümleri destek ödemelerini içermez; toplam geri ödeme hedefi gibi okunmamalıdır.**
 
 `/?page=crystal`: yalnızca giriş yapılmış çevrimiçi hesap. Gold ve Bonus Gold oyun içinde kalır; ödeme veya para çekme eklenmez. 6×5 alan, 8/10/12+ eşleşme, eşleşme kalana kadar takla, 2×–500× küreler ve 5.000× temel bedel toplam kazanç sınırı korunur. 4 yıldız 15 free spin; bonus içinde 3 yıldız +5 tur verir. Her turdaki sembol kazancı ve yıldız ödemeleri aktif matematik ölçeğiyle hesaplanır.
 
@@ -16,14 +18,14 @@ Pozitif güvenli tam sayı kadar ücretli ana tur seçilir. Sayı 10/50/100 gibi
 
 Yönetim → Ekonomi → Kristal RTP. `crystalRtp` (Kristal RTP ayarı) yetkisi gerekir; yalnızca Gold düzenleme yetkisi bu işlemi açmaz; menüyü saklamanın yanında sunucu ayrı yetki kontrolü uygular.
 
-- Varsayılan hedef %99,99; 0–200 arası iki ondalıklı hedef desteklenir.
+- Varsayılan temel RTP hedefi %99,99; 0–200 arası iki ondalıklı hedef desteklenir.
 - GET/POST `/api/crystal/settings`. POST, hedefi sayı ve beklenen `revision` ile gönderir. Başka yönetici arada değiştirirse 409 döner.
 - Kalıcı SQLite tablosunda yüzde × 100 tam sayı saklanır. Önceki/yeni değer ve yönetici kimliği audit’e yazılır.
 - Bütün oyuncular için aynı ayar geçerlidir ve oyun ekranında gösterilir. Hedef kimlik, bakiye veya geçmiş kayba göre değiştirilmez.
 - Yeni ayar yeni ücretli turlara ve yeni satın almalara uygulanır. Açılmış bonusun `math` anlık görüntüsü, hedefi, ölçeği ve sürümü korunur. Bekleyen eski v2 bonuslar eski %90 ayarlarını kullanır.
 - Ayar, üretim hesaplayıcısındaki sembol ve yıldız ödeme ölçeklerini değiştirir. Yalnızca arayüz etiketi değildir. Olasılıklar veya kişiler için ayrı gizli kurallar eklenmez.
 
-## Matematik ve doğrulama
+## Temel oyun matematiği ve doğrulama (destek kapalıyken)
 
 Normal oyun için baz dönüş ölçümü %100,8543785’tir (`payScale=scatterScale=1`); hedefe göre ortak ölçek uygulanır. Satın alınan paket için 100× bedel ödenip 15 ücretsiz turdan başlanır. Bu modun %99,99 hedefe ulaşması için ayrı ölçek gerekir. 1.000.000 ham bonus örneğinden, 5.000× kazanç sınırını hesaba katan hedef/ölçek eğrisi çıkarılır; ara hedefler arasında doğrusal geçiş kullanılır. Aktif bonus tablosu oyuncuya gösterilir. Bu yüzden satın alınan bonusun ödül tablosu doğal bonusla aynı değildir.
 
@@ -45,3 +47,34 @@ node scripts/crystal-rtp.mjs --rounds 5000000 --seed 20261113 --output docs/CRYS
 ## Veri ve yayın
 
 Bonus tablosuna `math` alanı eklenir; eski kalan ücretsiz turlar ve bakiyeler kaynak göçünde silinmez. RTP ayarı `crystal_settings` tablosunda tutulur. Uygulamanın genel test sıfırlaması bu ayarı da temizler; sonraki istekte %99,99 varsayılanı geri gelir. Ücretsiz Render’ın geçici diski yeni yayında veri kaybı riski taşımaya devam eder; bu özellik kalıcı depolama sağlamaz.
+
+
+## 1.18: Net kazanma ihtimali ve açık destek
+
+Varsayılan net kazanma ihtimali %99,99 ve destek modu açıktır. Bu, önceki RTP ayarı değildir. Kazanmak, bir ücretli turun ve ona bağlı bütün bonusların veya satın alınan paketin bütün turlarının sonunda, başlangıç maliyetinden daha fazla Gold geri almaktır. Her ücretsiz tur ayrı bir %99,99 seçimi yapmaz.
+
+Her yeni ücretli başlangıçta kriptografik RNG 0–9999 arasında eşit olasılıklı bir değer seçer. Değer `winChance × 100` altındaysa başlangıç kazançlı sınıfa ayrılır. %99,99 için 9999 değer kazançlı, bir değer kazançsızdır. Bu, gerçek oturumda her 10.000 başlangıcın tam birinin kaybetmesi garantisi değildir.
+
+Kazançlı sınıfta gerçek takla/bonus sonuçları hesaplanır. Toplam geri ödeme maliyet + en az %1 net kazanç altında kalırsa fark, son sonuçta açıkça `supportPayout` olarak ödenir. Orijinal sembol/bonus ödemesi `symbolPayout` olarak ayrı tutulur. Boş tahtaya sahte eşleşme veya sahte çarpan eklenmez. Kazançsız sınıfta toplam ödemesi maliyeti aşmayan gerçek bir sonuç dizisi örneklenir; örnekleme 128 denemeyle sınırlıdır, sonra eşleşmesiz sıfır ödeme dizisi kullanılır. Bu sonuç üretimi doğal RTP moduyla aynı dağılımı iddia etmez.
+
+Yeni doğal tur ve satın alma başlangıcında, bağlı bütün ücretsiz turlar da sunucuda hesaplanıp `crystal_bonus.plan` içinde özel olarak saklanır. API bu planı, seçilmiş sınıfı veya gelecekteki ödülleri göndermez. Sadece oynanan sonuç açıklanır. Plan her ücretsiz turda bir adım ilerler; tekrar gönderim, yeniden giriş veya yeniden başlatma sonucu yeniden seçmez. Başlamış eski bonuslar eski kurallarıyla tamamlanır.
+
+%99,99 **net kazanma** ve %99,99 **toplam RTP** aynı anda garanti edilemez. Destek açıkken RTP alanı yalnızca temel takla oyununun ölçeğidir; destek dahil toplam dönüş oranı değildir. Destek kapalıyken önceki doğal RTP modu geçerlidir. Panel ve oyun ekranı bu ayrımı açıklar. Yüksek net kazanma ihtimali Gold arzını artırır. 5.000× toplam ödeme sınırına destek de dahildir.
+
+Yönetim → Ekonomi → Kristal RTP ve Kazanma:
+
+- `crystalWinChance`: %0–100 arasında iki ondalıklı ihtimali ve destek açık/kapalı seçimini kaydeder.
+- `crystalRtp`: temel RTP alanını kaydeder. İki yetki ayrıdır; yalnızca RTP yetkisi kazanma ihtimalini değiştirmez.
+- Ortak ayar sürümüyle eski form gönderimi reddedilir. Değişiklikler audit tablosuna önceki/yeni değerlerle yazılır.
+- Mevcut bonusun ayarı ve sonuç planı korunur. Yeni değer yalnızca yeni ücretli başlangıçlara uygulanır.
+
+### Destekli mod kontrolü
+
+`node scripts/crystal-win-audit.mjs --rounds 100000 --output docs/CRYSTAL-WIN-VALIDATION.json`
+
+| Mod | Başlangıç | Seçilen / gerçekten net kazançlı | Ölçülen net kazanma | Destek dahil dönüş |
+| --- | ---: | ---: | ---: | ---: |
+| Normal ve bağlı bonuslar | 100.000 | 99.990 / 99.990 | %99,990 | %191,83 |
+| Satın alınan paketler | 100.000 | 99.986 / 99.986 | %99,986 | %155,90 |
+
+Bu sonlu örneklerin dönüş oranları gelecekte aynen gerçekleşecek oranlar değildir. Önemli doğrulama, seçilmiş her kazançlı başlangıcın gerçek toplam netinin en az %1 artıda olması ve seçilmemiş başlangıçların net artıya geçmemesidir. Birim testler %0/%50/%99,99/%100 seçim eşiklerini 10.000 değerin tamamı üzerinde ayrıca doğrular. %99,99 varsayılan gerçek olasılık eşiğidir; örneklem yüzdesinin tam %99,99 çıkması şart değildir.

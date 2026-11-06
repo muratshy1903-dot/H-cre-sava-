@@ -56,7 +56,7 @@ test('bonus state survives service recreation, keeps its wallet and stake, and d
     json(res,status,payload){res.status=status;res.payload=payload;}};
   const play=(game,id,wallet='bonus',bet=100)=>{const res={};game.route({method:'POST'},res,{pathname:'/api/crystal'},p,{requestId:id,wallet,bet});return res.payload;};
   try{
-    let game=createCrystalGame(deps);const paid=play(game,'first-request-0001');assert.equal(paid.round.cost,100);assert.equal(p.bonus,425);assert.equal(p.gold,1000);assert.equal(paid.bonus.remaining,3);
+    let game=createCrystalGame(deps);db.exec('UPDATE crystal_settings SET win_control=0');const paid=play(game,'first-request-0001');assert.equal(paid.round.cost,100);assert.equal(p.bonus,425);assert.equal(p.gold,1000);assert.equal(paid.bonus.remaining,3);
     clock+=1000;game=createCrystalGame(deps);
     assert.throws(()=>play(game,'wrong-wallet-0001','gold'),/Bonus turlarını/);assert.equal(p.gold,1000);
     const free=play(game,'second-request-001');assert.equal(free.round.cost,0);assert.equal(free.bonus.remaining,2);assert.equal(p.bonus,450);

@@ -1,0 +1,28 @@
+[
+  {
+    "mode": "natural",
+    "starts": 100000,
+    "configuredWinChance": 99.99,
+    "selectedWins": 99990,
+    "netProfitableStarts": 99990,
+    "measuredWinPercent": 99.99,
+    "totalRounds": 135435,
+    "totalReturnPercent": 191.82683932999998,
+    "symbolReturnPercent": 105.7660327,
+    "supportReturnPercent": 86.06080663,
+    "maxBaseWin": 3074.94648
+  },
+  {
+    "mode": "buy",
+    "starts": 100000,
+    "configuredWinChance": 99.99,
+    "selectedWins": 99986,
+    "netProfitableStarts": 99986,
+    "measuredWinPercent": 99.98599999999999,
+    "totalRounds": 2295301,
+    "totalReturnPercent": 155.89799764929998,
+    "symbolReturnPercent": 100.70809046950001,
+    "supportReturnPercent": 55.1899071798,
+    "maxBaseWin": 5000
+  }
+]

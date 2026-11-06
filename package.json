@@ -10,7 +10,7 @@
     "start": "node server/index.js",
     "local": "node scripts/start-local.mjs",
     "test": "node --test tests/*.test.js",
-    "check": "node --check server/index.js && node --check server/features.js && node --check dist/app.js && node --check dist/features.js && node --check dist/progression.js && node --check dist/engine.js && node --check server/crystal-game.js && node --check dist/crystal-rules.js && node --check dist/crystal-view.js && node --check dist/crystal-auto.js && node --check dist/management.js && node --check scripts/crystal-rtp.mjs",
+    "check": "node --check server/index.js && node --check server/features.js && node --check dist/app.js && node --check dist/features.js && node --check dist/progression.js && node --check dist/engine.js && node --check server/crystal-game.js && node --check server/crystal-win.js && node --check dist/crystal-rules.js && node --check dist/crystal-view.js && node --check dist/crystal-auto.js && node --check dist/management.js && node --check scripts/crystal-rtp.mjs && node --check scripts/crystal-win-audit.mjs",
     "stress": "node tests/stress.mjs",
     "dev": "node scripts/dev-server.mjs"
   },
