@@ -1,0 +1,22 @@
+{
+  "rulesVersion": 3,
+  "mode": "buy",
+  "targetRtp": 99.99,
+  "rounds": 1000000,
+  "bet": 100000,
+  "seed": 20261112,
+  "payScale": 4.528827702851856,
+  "scatterScale": 4.528827702851856,
+  "measuredRtp": 100.10042468058087,
+  "ci95": [
+    99.52410329252214,
+    100.6767460686396
+  ],
+  "standardError": 0.2940415245197611,
+  "freeSpins": 22991741,
+  "triggers": 1000000,
+  "caps": 1077,
+  "maxWin": 50,
+  "maxTumbles": 13,
+  "scatterRtp": 8.260343311029999
+}

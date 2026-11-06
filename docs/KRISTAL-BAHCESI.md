@@ -1,49 +1,47 @@
-# Kristal Bahçesi — 1.16.0 / matematik sürümü 2
+# Kristal Bahçesi — 1.17.0 / matematik sürümü 3
 
-Menü: Kristal Bahçesi (`/?page=crystal`). Çevrimiçi giriş gerekir. Normal Gold ve Bonus Gold ayrı seçilir; kazanç seçilen bakiyeye eklenir. Gold gerçek parayla satılmaz; para çekme veya gerçek ödül eklenmez.
+`/?page=crystal`: yalnızca giriş yapılmış çevrimiçi hesap. Gold ve Bonus Gold oyun içinde kalır; ödeme veya para çekme eklenmez. 6×5 alan, 8/10/12+ eşleşme, eşleşme kalana kadar takla, 2×–500× küreler ve 5.000× temel bedel toplam kazanç sınırı korunur. 4 yıldız 15 free spin; bonus içinde 3 yıldız +5 tur verir. Her turdaki sembol kazancı ve yıldız ödemeleri aktif matematik ölçeğiyle hesaplanır.
 
-## Mekanik
+## Satın alma
 
-- Tur bedelleri: 100, 500, 1.000, 5.000, 10.000, 50.000, 100.000, 500.000, 1.000.000 ve 5.000.000.
-- 6×5 alan; 8–9, 10–11 ve 12+ aynı sembol ayrı ödeme basamaklarıdır. Sembollerin yan yana olması gerekmez.
-- Eşleşen semboller silinir; kalanlar aşağı düşer ve yeni semboller üstten gelir. Eşleşme kalana veya azami kazanca ulaşana kadar takla devam eder. Sabit takla sınırı yoktur.
-- Bütün takla kazançları toplanır. Aynı turdaki küre değerleri toplanır ve sonuç bir kez çarpılır. Değerler: 2, 3, 5, 10, 25, 50, 100, 250, 500.
-- 4 / 5 / 6+ yıldız sırasıyla bedelin 3 / 5 / 100 katını çarpan uygulanmadan öder. Dört veya daha fazla yıldız 15 ücretsiz tur açar. Ücretsiz turda üç veya daha fazla yıldız +5 tur verir.
-- Kazançlı ücretsiz turdaki küreler, bonusun toplam çarpanına eklenir. Birikmiş çarpan yeni küre gelen kazançlı turda uygulanır; küre gelmezse sembol kazancı çarpansız ödenir. Kazançsız turdaki küre bonus çarpanına eklenmez.
-- Normal tur ve onun açtığı bütün ücretsiz turlar için ortak sınır 5.000× ilk tur bedelidir. 5 milyonluk turda toplam üst sınır 25 milyardır. Sınırda fazla kazanç kesilir, bonus ve kalan ücretsiz turlar kapanır.
-- Bonus boyunca bakiye türü ve bedel kilitlidir; yeniden bağlanınca ücretsiz tur sayısı, çarpan ve toplam kazanç devam eder.
-- Kullanıcı kazanılmış ücretsiz turları otomatik sürdürebilir ve durdurabilir. Bu seçenek yeni ücretli tur başlatmaz. Hızlı sonuç sadece animasyonu kısaltır.
+Seçilen temel tur bedelinin 100 katı karşılığında 15 free spin. Örneğin 100 Gold’luk tur için 10.000; 5.000.000’luk tur için 500.000.000 Gold. Bakiye türü seçilir, fiyat ve azami toplam ödül onaydan önce gösterilir. Paket ücreti bir kez alınır; ücretsiz turlar ayrıca ücretlendirilmez. Başka bir bonus devam ederken paket alınamaz. Toplam ödül sınırı paket ücretinin değil temel tur bedelinin 5.000 katıdır; en fazla 25 milyar Gold.
 
-Görseller ve ödül tablosu Agarm’a özgüdür. Yayınlanmış Gates serisi kurallarındaki takla/pay-anywhere/toplanan çarpan/free-spin ilişkileri referans alınır; bu, sağlayıcının oyunu veya lisanslı entegrasyonu değildir. Kaynak: https://www.pragmaticplay.com/en/news/zeus-strikes-mighty-multipliers-in-pragmatic-plays-latest-release-gates-of-olympus-1000/ ve sağlayıcının oyun kuralları belgesi https://yesplay.bet/assets/documents/pragmatic-play-Gates-of-Olympus-1000-rules.pdf . Sağlayıcının RTP’si ve ödül tablosu kopyalanmaz.
+`POST /api/crystal`: `kind: "buy"`, `requestId`, `wallet`, `bet`, `settingsRevision`. Satın alma makbuzu, bakiye, ledger ve 15 tur aynı transaction içinde kaydedilir. Tekrarlanan istekte aynı makbuz döner; ikinci ücret veya ikinci paket verilmez. Aynı kimliği spin ve buy olarak kullanmak reddedilir. Eski fiyat/RTP sürümüyle yeni satın alma yapılmaz. Sonraki ücretsiz turlar `kind: "spin"` kullanır.
 
-## RTP
+## Otomatik oyun
 
-Hedef %90’dır. Her bir ücretli turun açtığı ücretsiz turlar, yeniden tetiklemeler ve 5.000× sınır dahil edilerek ölçülür. Ayar, bütün hesaplar için aynıdır; bakiye, geçmiş kayıp veya kullanıcı kimliğine göre sonuç değiştirilmez. Üretimde Node kriptografik rastgelelik kaynağı kullanılır.
+Pozitif güvenli tam sayı kadar ücretli ana tur seçilir. Sayı 10/50/100 gibi sabit seçeneklerle sınırlı değildir. Her ücretli turda normal bedel ayrı düşer; önceden toplu ücret alınmaz. Bonuslar seçilen sayıdan düşmez ve son ana turun açtığı bonus da tamamlanır. Bakiye yetersizliği, istek hatası, Durdur veya sayfadan çıkış yeni turları keser. Gönderilmiş bir tur sonuçlanır; Durdur bu turu geri almaz. Yenilemede otomatik oyun kendiliğinden devam etmez. Bağlantı sorunu olan son işlem aynı kimlikle kontrol edilir. Otomatik paket satın alınmaz.
 
-Tekrar üretilebilir ölçüm:
+## RTP paneli
+
+Yönetim → Ekonomi → Kristal RTP. `crystalRtp` (Kristal RTP ayarı) yetkisi gerekir; yalnızca Gold düzenleme yetkisi bu işlemi açmaz; menüyü saklamanın yanında sunucu ayrı yetki kontrolü uygular.
+
+- Varsayılan hedef %99,99; 0–200 arası iki ondalıklı hedef desteklenir.
+- GET/POST `/api/crystal/settings`. POST, hedefi sayı ve beklenen `revision` ile gönderir. Başka yönetici arada değiştirirse 409 döner.
+- Kalıcı SQLite tablosunda yüzde × 100 tam sayı saklanır. Önceki/yeni değer ve yönetici kimliği audit’e yazılır.
+- Bütün oyuncular için aynı ayar geçerlidir ve oyun ekranında gösterilir. Hedef kimlik, bakiye veya geçmiş kayba göre değiştirilmez.
+- Yeni ayar yeni ücretli turlara ve yeni satın almalara uygulanır. Açılmış bonusun `math` anlık görüntüsü, hedefi, ölçeği ve sürümü korunur. Bekleyen eski v2 bonuslar eski %90 ayarlarını kullanır.
+- Ayar, üretim hesaplayıcısındaki sembol ve yıldız ödeme ölçeklerini değiştirir. Yalnızca arayüz etiketi değildir. Olasılıklar veya kişiler için ayrı gizli kurallar eklenmez.
+
+## Matematik ve doğrulama
+
+Normal oyun için baz dönüş ölçümü %100,8543785’tir (`payScale=scatterScale=1`); hedefe göre ortak ölçek uygulanır. Satın alınan paket için 100× bedel ödenip 15 ücretsiz turdan başlanır. Bu modun %99,99 hedefe ulaşması için ayrı ölçek gerekir. 1.000.000 ham bonus örneğinden, 5.000× kazanç sınırını hesaba katan hedef/ölçek eğrisi çıkarılır; ara hedefler arasında doğrusal geçiş kullanılır. Aktif bonus tablosu oyuncuya gösterilir. Bu yüzden satın alınan bonusun ödül tablosu doğal bonusla aynı değildir.
+
+| Bağımsız kontrol | Başlangıç sayısı | Hedef | Ölçülen RTP | Yaklaşık %95 güven aralığı |
+| --- | ---: | ---: | ---: | --- |
+| Normal ücretli tur ve açtığı bütün bonuslar | 5.000.000 | %99,99 | %99,2097 | %98,0087–%100,4107 |
+| Satın alınan 15 free spin ve bütün yeniden tetiklemeler | 1.000.000 paket | %99,99 | %100,1004 | %99,5241–%100,6767 |
+
+İki kontrolün güven aralığı %99,99 hedefini içerir. Bu sonlu Monte Carlo ölçümüdür; kesin teorik ispat veya bağımsız sertifika değildir. Başka panel değerleri, düşük bedellerde tam sayı yuvarlaması ve üst sınıra ulaşan çok nadir sonuçlar nedeniyle hedef ile gerçekleşen oran farklı olabilir. Panelde seçilen her değer ayrıca sertifikalandırılmış sayılmaz. 100 üzerindeki hedefler Gold arzını artırabilir. Sonuçlar oturum başına geri ödeme veya kazanç garantisi değildir.
 
 ```sh
-node scripts/crystal-rtp.mjs --rounds 20000000 --seed 20261108 --scale 1 --output docs/CRYSTAL-RTP-BASELINE.json
-node scripts/crystal-rtp.mjs --rounds 20000000 --seed 20261109 --output docs/CRYSTAL-RTP-VALIDATION.json
-node scripts/crystal-rtp.mjs --rounds 5000000 --bet 100 --seed 20261110 --output docs/CRYSTAL-RTP-MINIMUM.json
+node scripts/crystal-rtp.mjs --buy --scale 1 --rounds 1000000 --seed 20261111 --calibrate-buy --output docs/CRYSTAL-BUY-CALIBRATION.json
+node scripts/crystal-rtp.mjs --buy --rounds 1000000 --seed 20261112 --output docs/CRYSTAL-BUY-VALIDATION-9999.json
+node scripts/crystal-rtp.mjs --rounds 5000000 --seed 20261113 --output docs/CRYSTAL-VALIDATION-9999.json
 ```
 
-Kalibrasyon ve bağımsız doğrulama farklı tohumlar kullanır. JSON raporları ücretli tur sayısı, tüm ücretsiz turlar, ölçülen RTP, standart hata ve yaklaşık %95 güven aralığı içerir. Bu bir matematiksel ispat veya bağımsız sertifikasyon değildir. Sonlu örneklem ve tam sayı Gold yuvarlaması nedeniyle tam %90 veya her oturumda %90 geri ödeme garanti edilmez.
+Ölçümler üretim `crystalRound` fonksiyonunu kullanır. Yalnızca kriptografik rastgelelik yerine tekrar üretilebilir PRNG geçirilir. Doğrulama tohumları kalibrasyondan ayrıdır. Önceki `CRYSTAL-RTP-*` raporları v2 matematiğinin tarihsel ölçümleridir; v3 için geçerli sonuç gibi sunulmaz.
 
-### Ölçüm sonucu
+## Veri ve yayın
 
-| Ölçüm | Ücretli tur | Tur bedeli | Ölçülen RTP | Yaklaşık %95 güven aralığı |
-| --- | ---: | ---: | ---: | --- |
-| Ayar öncesi kalibrasyon (`payScale=1`) | 20.000.000 | 100.000 | %100,8544 | %100,2448–%101,4640 |
-| Bağımsız final doğrulama (`payScale=0.88`) | 20.000.000 | 100.000 | %90,1348 | %89,5891–%90,6805 |
-| En küçük bedel (`payScale=0.88`) | 5.000.000 | 100 | %90,6486 | %89,5411–%91,7560 |
-
-Final doğrulama 6.676.545 ücretsiz tur içerir. Hedef %90, iki final kontrolünün güven aralığının içindedir. 5.000× sınırına erişilebilirlik ayrıca kontrollü rastgele dizisiyle test edilir; bu örneklemlerde maksimum sonucun görülmemesi sınırın erişilemez olduğu anlamına gelmez. Kalibrasyondan elde edilen ölçek, anlaşılır bir ödül tablosu için 0.88’e yuvarlanmıştır. Raporlar Node üretim hesaplayıcısını kullanır; yalnızca kriptografik rastgele kaynağın yerine tekrar üretilebilir bir PRNG geçirilir.
-
-## İşlem güvenliği
-
-`GET /api/crystal`: kendi bakiye, bekleyen bonus, son 20 tur. `POST /api/crystal`: `requestId`, `wallet`, `bet`; sonuç istemciden alınmaz. Sunucu aynı SQLite transaction içinde tur, bakiye, bonus, toplam kazanç ve hesap hareketini kaydeder. Tekrarlanan kimlik ikinci ücret veya ikinci free spin tüketmez. Bonus turları da 900 ms alt aralıkla oynanamaz.
-
-`crystal_bonus` tablosuna `multiplier`, `won`, `version` sütunları eklenir. Var olan hesaplar, bakiyeler ve bekleyen ücretsiz tur sayıları korunur. Toplamlar 32 bit işlemlerle kesilmez; 25 milyar ödül JS güvenli tam sayı alanındadır. Sınır ve bakiye kontrolleri sunucudadır.
-
-Ücretsiz Render servisinin geçici diski güncellemede veri kaybı riski taşır; kalıcı depolama ve doğrulanmış yedek ayrıca gereklidir. Kullanıcının mevcut ücretsiz servise yayın talimatı, bu altyapı riskini ortadan kaldırmaz.
+Bonus tablosuna `math` alanı eklenir; eski kalan ücretsiz turlar ve bakiyeler kaynak göçünde silinmez. RTP ayarı `crystal_settings` tablosunda tutulur. Uygulamanın genel test sıfırlaması bu ayarı da temizler; sonraki istekte %99,99 varsayılanı geri gelir. Ücretsiz Render’ın geçici diski yeni yayında veri kaybı riski taşımaya devam eder; bu özellik kalıcı depolama sağlamaz.
