@@ -8,7 +8,7 @@ test('crystal API authenticates, isolates wallets, prevents duplicate charges an
   const request={requestId:'duplicate-request-001',wallet:'gold',bet:100};
   try{
     assert.equal((await call(null,null)).status,401);assert.equal((await call(request,player,'https://foreign.test')).status,403);
-    for(const patch of [{wallet:'__proto__'},{bet:-100},{bet:0},{bet:1.5},{bet:'100'},{requestId:'x'}])assert.equal((await call({...request,...patch})).status,400);
+    for(const patch of [{wallet:'__proto__'},{bet:-100},{bet:0},{bet:1.5},{bet:'100'},{bet:5000001},{requestId:'x'}])assert.equal((await call({...request,...patch})).status,400);
     assert.equal((await call(request,other)).status,400);
     const responses=await Promise.all([call(request),call(request)]);assert.deepEqual(responses.map(r=>r.status),[200,200]);
     const r=responses[0].body.round;assert.deepEqual(responses[1].body.round,r);
@@ -17,6 +17,13 @@ test('crystal API authenticates, isolates wallets, prevents duplicate charges an
     assert.equal((await call({...request,wallet:'bonus'})).status,409);
     const rapid=await call({...request,requestId:'rapid-request-0001'});assert.equal(rapid.status,429);
     if(!current.bonus){db.prepare('UPDATE crystal_rounds SET at=at-2000 WHERE account_id=?').run(player.id);const b=await call({...request,requestId:'bonus-wallet-0001',wallet:'bonus'});assert.equal(b.status,200);assert.equal(b.body.user.gold,current.user.gold);assert.equal(b.body.user.bonus,5000+b.body.round.net);}
+    for(const wallet of ['gold','bonus']){
+      const high=seed('high-'+wallet,10000000,10000000);
+      const requestHigh={requestId:'maximum-stake-'+wallet,wallet,bet:5000000};
+      const big=await call(requestHigh,high);assert.equal(big.status,200);assert.equal(big.body.round.cost,5000000);
+      assert.equal(big.body.user[wallet],10000000+big.body.round.net);assert.ok(Number.isSafeInteger(big.body.user[wallet]));
+      const repeatHigh=await call(requestHigh,high);assert.equal(repeatHigh.body.user[wallet],big.body.user[wallet]);
+    }
     assert.equal((await call(null,other)).body.history.length,0);
     current=(await call()).body;const saved=JSON.parse(db.prepare('SELECT profile FROM accounts WHERE id=?').get(player.id).profile);assert.equal(saved.gold,current.user.gold);assert.equal(saved.bonus,current.user.bonus);
     const repeated=await call(request);assert.equal(repeated.status,200);assert.equal(repeated.body.user.gold,current.user.gold);assert.equal(repeated.body.history.length,current.history.length);
