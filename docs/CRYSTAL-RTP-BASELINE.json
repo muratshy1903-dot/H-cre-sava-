@@ -1,0 +1,20 @@
+{
+  "rulesVersion": 2,
+  "targetRtp": 90,
+  "rounds": 20000000,
+  "bet": 100000,
+  "seed": 20261108,
+  "payScale": 1,
+  "measuredRtp": 100.85437850000257,
+  "ci95": [
+    100.24476317138297,
+    101.46399382862216
+  ],
+  "standardError": 0.3110282288875488,
+  "freeSpins": 6697910,
+  "triggers": 291623,
+  "caps": 0,
+  "maxWin": 4872.75,
+  "maxTumbles": 14,
+  "scatterRtp": 10.534305
+}

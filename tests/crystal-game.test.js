@@ -3,12 +3,46 @@ import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {crystalRound,createCrystalGame} from '../server/crystal-game.js';
 
-test('original crystal rules pay matches, apply one multiplier and award bonus only on paid turns',()=>{
-  const matched=crystalRound(100,{random:()=>0});
-  assert.equal(matched.frames.length,5);assert.equal(matched.multiplier,2);
-  assert.equal(matched.payout,750);assert.equal(matched.bonusAwarded,0);
-  const bonus=free=>{let i=0;return crystalRound(100,{free,random:()=>i++<3?20:[0,4,8,12,15,18][(i-4)%6]});};
-  assert.equal(bonus(false).bonusAwarded,3);assert.equal(bonus(true).bonusAwarded,0);
+test('tumbles continue past five evaluations until matches end',()=>{
+  let calls=0;
+  const result=crystalRound(100000,{random:()=>calls++<210?0:((calls-211)%8)*12});
+  assert.equal(result.tumbles,7);assert.equal(result.frames.length,8);assert.equal(result.frames.at(-1).cleared.length,0);
+  assert.equal(result.payout,result.frames.reduce((sum,f)=>sum+f.win,0));
+});
+
+test('four scatters award 15 spins, three retrigger 5 free spins, losing orbs do not accumulate',()=>{
+  const scatter=(count,free=false)=>{let i=0;return crystalRound(100,{free,random:()=>i++<count?96:((i-count-1)%8)*12});};
+  assert.equal(scatter(4).bonusAwarded,15);assert.equal(scatter(4).scatterPayout,300);assert.equal(scatter(5).scatterPayout,500);assert.equal(scatter(6).scatterPayout,10000);assert.equal(scatter(3).bonusAwarded,0);assert.equal(scatter(3,true).bonusAwarded,5);
+  let i=0;const loss=crystalRound(100,{free:true,featureMultiplier:7,random:max=>max===1000?0:i++===0?99:((i-2)%8)*12});
+  assert.equal(loss.payout,0);assert.equal(loss.featureMultiplier,7);
+});
+
+test('orb values add once across tumbles and a winning free spin carries its multiplier forward',()=>{
+  let i=0;
+  const r=crystalRound(100000,{free:true,featureMultiplier:7,random:max=>{if(max===1000)return 0;const n=i++;return n<8?0:n===8?99:12+((n-9)%7)*12;}});
+  assert.equal(r.orbTotal,2);assert.equal(r.multiplier,9);assert.equal(r.featureMultiplier,9);assert.equal(r.payout,r.base*9);
+  let j=0;const withoutOrb=crystalRound(100000,{free:true,featureMultiplier:9,random:()=>j++<8?0:12+((j-9)%7)*12});
+  assert.ok(withoutOrb.base>0);assert.equal(withoutOrb.multiplier,1);assert.equal(withoutOrb.payout,withoutOrb.base);assert.equal(withoutOrb.featureMultiplier,9);
+});
+
+test('maximum stake can win exactly 5000x without 32-bit truncation and stops the tumble',()=>{
+  let i=0;
+  const r=crystalRound(5000000,{random:max=>max===1000?999:i++<8?84:i<=30?99:84});
+  assert.equal(r.payout,25000000000);assert.equal(r.capped,true);assert.ok(Number.isSafeInteger(r.payout));
+  let j=0;const remainder=crystalRound(5000000,{free:true,featureMultiplier:500,cap:12345,random:()=>j++<30?84:0});
+  assert.equal(remainder.payout,12345);assert.equal(remainder.capped,true);
+});
+
+test('existing bonus schema migrates without losing turns, and the 5000x cap closes retriggers',()=>{
+  const db=new DatabaseSync(':memory:');db.exec('CREATE TABLE accounts(id INTEGER PRIMARY KEY);INSERT INTO accounts VALUES(1);CREATE TABLE crystal_bonus(account_id INTEGER PRIMARY KEY,wallet TEXT,bet INTEGER,remaining INTEGER);INSERT INTO crystal_bonus VALUES(1,\'gold\',5000000,3)');
+  const p={id:1,gold:0,bonus:100},fail=message=>{throw Error(message);};let response;
+  const game=createCrystalGame({db,fail,save(){},spend(){throw Error('Free spins must not charge');},atomic:fn=>fn(),mePublic:p=>p,json(res,status,payload){response=payload;},round(bet,options){assert.equal(options.free,true);assert.equal(options.featureMultiplier,100);assert.equal(options.cap,123);return{payout:123,bonusAwarded:5,featureMultiplier:102,capped:true,frames:[]};}});
+  try{
+    assert.equal(db.prepare('SELECT remaining FROM crystal_bonus').get().remaining,3);
+    db.prepare('UPDATE crystal_bonus SET won=?,multiplier=100').run(25000000000-123);
+    game.route({method:'POST'},{},{pathname:'/api/crystal'},p,{requestId:'feature-cap-test-0001',wallet:'gold',bet:5000000});
+    assert.equal(response.round.remaining,0);assert.equal(response.round.featureWon,25000000000);assert.equal(response.bonus,null);assert.equal(p.gold,123);assert.equal(p.bonus,100);
+  }finally{db.close();}
 });
 
 test('bonus state survives service recreation, keeps its wallet and stake, and does not charge free turns',()=>{
