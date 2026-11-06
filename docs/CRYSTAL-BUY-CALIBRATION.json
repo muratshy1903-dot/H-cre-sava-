@@ -1,0 +1,192 @@
+{
+  "rulesVersion": 3,
+  "mode": "buy",
+  "targetRtp": 99.99,
+  "rounds": 1000000,
+  "bet": 100000,
+  "seed": 20261111,
+  "payScale": 1,
+  "scatterScale": 1,
+  "measuredRtp": 22.767238349999673,
+  "ci95": [
+    22.607197381255162,
+    22.927279318744183
+  ],
+  "standardError": 0.08165355548189335,
+  "freeSpins": 22990988,
+  "triggers": 1000000,
+  "caps": 6,
+  "maxWin": 50,
+  "maxTumbles": 14,
+  "scatterRtp": 1.812643,
+  "buyCurve": [
+    {
+      "targetRtp": 0,
+      "scale": 0
+    },
+    {
+      "targetRtp": 5,
+      "scale": 0.21961381187765028
+    },
+    {
+      "targetRtp": 10,
+      "scale": 0.43922762375672164
+    },
+    {
+      "targetRtp": 15,
+      "scale": 0.658841435635793
+    },
+    {
+      "targetRtp": 20,
+      "scale": 0.8784552475148644
+    },
+    {
+      "targetRtp": 25,
+      "scale": 1.098227851262834
+    },
+    {
+      "targetRtp": 30,
+      "scale": 1.3186669408511875
+    },
+    {
+      "targetRtp": 35,
+      "scale": 1.53977091185169
+    },
+    {
+      "targetRtp": 40,
+      "scale": 1.7618308639995917
+    },
+    {
+      "targetRtp": 45,
+      "scale": 1.9849981665785776
+    },
+    {
+      "targetRtp": 50,
+      "scale": 2.209281858593215
+    },
+    {
+      "targetRtp": 55,
+      "scale": 2.434712397122496
+    },
+    {
+      "targetRtp": 60,
+      "scale": 2.6616175726658753
+    },
+    {
+      "targetRtp": 65,
+      "scale": 2.890046629225651
+    },
+    {
+      "targetRtp": 70,
+      "scale": 3.1198916140326105
+    },
+    {
+      "targetRtp": 75,
+      "scale": 3.350994678727659
+    },
+    {
+      "targetRtp": 80,
+      "scale": 3.5835583310401375
+    },
+    {
+      "targetRtp": 85,
+      "scale": 3.817825968270938
+    },
+    {
+      "targetRtp": 90,
+      "scale": 4.053487479903595
+    },
+    {
+      "targetRtp": 95,
+      "scale": 4.290691674189873
+    },
+    {
+      "targetRtp": 99.99,
+      "scale": 4.528827702851856
+    },
+    {
+      "targetRtp": 100,
+      "scale": 4.529306285509449
+    },
+    {
+      "targetRtp": 105,
+      "scale": 4.769253774240667
+    },
+    {
+      "targetRtp": 110,
+      "scale": 5.01085001653081
+    },
+    {
+      "targetRtp": 115,
+      "scale": 5.254412147566256
+    },
+    {
+      "targetRtp": 120,
+      "scale": 5.499241040418212
+    },
+    {
+      "targetRtp": 125,
+      "scale": 5.745472783284811
+    },
+    {
+      "targetRtp": 130,
+      "scale": 5.992989462443177
+    },
+    {
+      "targetRtp": 135,
+      "scale": 6.241655377208133
+    },
+    {
+      "targetRtp": 140,
+      "scale": 6.491376048832365
+    },
+    {
+      "targetRtp": 145,
+      "scale": 6.742703580063392
+    },
+    {
+      "targetRtp": 150,
+      "scale": 6.995135658196716
+    },
+    {
+      "targetRtp": 155,
+      "scale": 7.2484717282847555
+    },
+    {
+      "targetRtp": 160,
+      "scale": 7.502803484705112
+    },
+    {
+      "targetRtp": 165,
+      "scale": 7.758155026449742
+    },
+    {
+      "targetRtp": 170,
+      "scale": 8.014771899711093
+    },
+    {
+      "targetRtp": 175,
+      "scale": 8.272439980349588
+    },
+    {
+      "targetRtp": 180,
+      "scale": 8.531134476622526
+    },
+    {
+      "targetRtp": 185,
+      "scale": 8.790935872976036
+    },
+    {
+      "targetRtp": 190,
+      "scale": 9.051923297666065
+    },
+    {
+      "targetRtp": 195,
+      "scale": 9.313932287498972
+    },
+    {
+      "targetRtp": 200,
+      "scale": 9.576950348018443
+    }
+  ]
+}

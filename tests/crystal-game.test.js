@@ -1,3 +1,4 @@
+import {CRYSTAL_LEGACY_MATH,crystalMath} from '../dist/crystal-rules.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
@@ -11,7 +12,7 @@ test('tumbles continue past five evaluations until matches end',()=>{
 });
 
 test('four scatters award 15 spins, three retrigger 5 free spins, losing orbs do not accumulate',()=>{
-  const scatter=(count,free=false)=>{let i=0;return crystalRound(100,{free,random:()=>i++<count?96:((i-count-1)%8)*12});};
+  const scatter=(count,free=false)=>{let i=0;return crystalRound(100,{free,math:CRYSTAL_LEGACY_MATH,random:()=>i++<count?96:((i-count-1)%8)*12});};
   assert.equal(scatter(4).bonusAwarded,15);assert.equal(scatter(4).scatterPayout,300);assert.equal(scatter(5).scatterPayout,500);assert.equal(scatter(6).scatterPayout,10000);assert.equal(scatter(3).bonusAwarded,0);assert.equal(scatter(3,true).bonusAwarded,5);
   let i=0;const loss=crystalRound(100,{free:true,featureMultiplier:7,random:max=>max===1000?0:i++===0?99:((i-2)%8)*12});
   assert.equal(loss.payout,0);assert.equal(loss.featureMultiplier,7);

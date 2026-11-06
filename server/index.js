@@ -71,7 +71,7 @@ for(const table of ['records','room_pools','room_settings','room_history','room_
  if(table==='room_controls'){const row=db.prepare('SELECT definition FROM room_controls WHERE room=?').get('MMA-1');if(row){const def=JSON.parse(row.definition);def.id='MMA-1';db.prepare('UPDATE room_controls SET definition=? WHERE room=?').run(JSON.stringify(def),'MMA-1');}}
 }
 const management=createManagement({db,account,save,atomic,budget,fail,json,sha,worlds,worldFor,connections,rooms:ROOMS,roomTiming,clients:()=>liveClients,canManage,isOwner,hasPermission,permissionsFor});
-const crystalGame=createCrystalGame({db,atomic,save,spend,fail,json,mePublic});
+const crystalGame=createCrystalGame({db,atomic,save,spend,fail,json,mePublic,hasPermission});
 const results=createRoomResults(db);
 const seasonChampions=createSeasonChampions(db);seasonChampions.sync();
 function snapshotFor(w,id,view){return {...w.snapshot(id,view),lastRound:results.latest,recordNotice:results.recordNotice(),seasonEntry:w.seasonEntry||null,season:seasonMeta(w.time),adminAnnouncement:management.announcement,roomRecord:features.recordDisplay(w.room,results.record(w.room)),roomWinner:results.winner(w.room)}}
