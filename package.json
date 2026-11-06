@@ -10,8 +10,9 @@
     "start": "node server/index.js",
     "local": "node scripts/start-local.mjs",
     "test": "node --test tests/*.test.js",
-    "check": "node --check server/index.js && node --check server/features.js && node --check dist/app.js && node --check dist/features.js && node --check dist/progression.js && node --check dist/engine.js",
-    "stress": "node tests/stress.mjs"
+    "check": "node --check server/index.js && node --check server/features.js && node --check dist/app.js && node --check dist/features.js && node --check dist/progression.js && node --check dist/engine.js && node --check server/crystal-game.js && node --check dist/crystal-rules.js && node --check dist/crystal-view.js",
+    "stress": "node tests/stress.mjs",
+    "dev": "node scripts/dev-server.mjs"
   },
   "dependencies": {
     "sharp": "0.35.5",
