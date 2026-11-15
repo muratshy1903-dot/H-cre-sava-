@@ -20,9 +20,9 @@ test('mobile detection includes Android, iOS and iPad desktop mode while desktop
  assert.equal(detectMobile({userAgent:'Mozilla Android'}),true);assert.equal(detectMobile({userAgent:'iPhone'}),true);assert.equal(detectMobile({platform:'MacIntel',maxTouchPoints:5}),true);
  assert.equal(detectMobile({userAgentData:{mobile:true}}),true);assert.equal(detectMobile({platform:'Win32',maxTouchPoints:10}),false);assert.equal(detectMobile({userAgent:'Mozilla Windows NT'}),false);
 });
-test('a natural pellet awards ten score and 25-cell virus farming preserves cell count and awards current configured hundred mass',()=>{
+test('a natural pellet awards ten score and 25-cell virus farming preserves cell count and awards requested 250 mass',()=>{
  const w=new World('FFA-1',{now:10000}),p=w.addPlayer('p');w.items=[];const c=p.cells[0];p.aim={x:c.x,y:c.y};w.spawn('food',c.x,c.y);w.step(.001);assert.equal(p.score,110);
- p.cells=Array.from({length:25},(_,i)=>w.cell(p,1000,500+i%5*1400,500+Math.floor(i/5)*1400));w.items=[];p.aim=w.center(p);w.spawn('virus',p.cells[0].x,p.cells[0].y);const before=p.cells.reduce((n,c)=>n+c.mass,0);w.step(.001);const after=p.cells.reduce((n,c)=>n+c.mass,0);assert.equal(p.cells.length,25);assert.ok(after-before>99&&after-before<=100);
+ p.cells=Array.from({length:25},(_,i)=>w.cell(p,1000,500+i%5*1400,500+Math.floor(i/5)*1400));w.items=[];p.aim=w.center(p);w.spawn('virus',p.cells[0].x,p.cells[0].y);const before=p.cells.reduce((n,c)=>n+c.mass,0);w.step(.001);const after=p.cells.reduce((n,c)=>n+c.mass,0);assert.equal(p.cells.length,25);assert.ok(after-before>249&&after-before<=250);
 });
 test('mobile hint reaches other players, spectators and room transitions through real WebSocket state',async()=>{
  const dir=await mkdtemp(path.join(os.tmpdir(),'agarm-device-'));process.env.AGARM_DATA=dir;
