@@ -19,9 +19,9 @@ test('room Boost multiplies affordable Gold equally, expires and respects input 
  w.split(p);w.time+=100;assert.equal(w.split(p),false);w.time+=400;assert.equal(w.split(p),true);
 });
 
-test('100 mass splits retain 100 and merge after 15 seconds without food',()=>{
+test('100 mass splits retain 100 and merge after 16 seconds (15 + 50 × 0.02) without food',()=>{
  const w=new World('FFA-1',{now:1000}),p=w.addPlayer('p');w.items=[];w.spawn=()=>{};p.cells[0].x=p.cells[0].y=4250;p.aim={x:4250,y:3750};w.split(p);const start=w.time;
- while(w.time-start<15000)w.step(.05);
+ while(w.time-start<16000)w.step(.05);
  assert.equal(p.cells.length,2);w.step(.05);assert.equal(p.cells.length,1);assert.equal(p.score,100);
 });
 

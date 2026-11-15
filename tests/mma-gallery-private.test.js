@@ -7,7 +7,7 @@ test('three MMA rooms use distinct 220k/250k/350k limits for growth, splits, mer
   p.cells=Array.from({length:25},(_,i)=>w.cell(p,limit-10,500+i%5*1500,500+Math.floor(i/5)*1500));p.aim=w.center(p);const added=w.addMass(p,1000);assert.equal(added,250);assert.equal(p.cells.length,25);assert.ok(p.cells.every(c=>c.mass===limit));assert.equal(p.score,limit*25);assert.equal(w.growthCapacity(p),0);const wallet=p.mmaGold;assert.equal(w.gold(p,'big'),false);assert.equal(p.mmaGold,wallet);
   p.cells=[w.cell(p,limit/2,4250,4250),w.cell(p,limit/2,4250,4250)];for(const c of p.cells)c.mergeAt=w.time-1;w.separateCells(p);assert.equal(p.cells.length,2,'merging cannot recreate an oversized fragment');assert.equal(w.snapshot('p').massLimits.split,limit);assert.equal(w.snapshot('p').massLimits.total,limit*25);
  }
- assert.equal(roomMassLimits('FFA-1').total,5500000);assert.equal(roomMassLimits('MMA-1').maxCell,220084);
+ assert.equal(roomMassLimits('FFA-1').total,5500000);assert.equal(roomMassLimits('MMA-1').maxCell,220000);
 });
 
 test('MMA room wallets are independently renewed and existing MMA-1 balance is preserved',()=>{

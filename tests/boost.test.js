@@ -14,9 +14,9 @@ test('players cannot activate personal Boost; admin room rates apply to normal G
  w.time=1200;w.command('p',{type:'gold',kind:'big'});assert.equal(p.gold,600);assert.equal(w.snapshot('p').self.goldBoostMultiplier,1);
  const no=new World('GSZ-1'),g=no.addPlayer('g',{gold:10000});no.boost={gold:5,feedMs:50,splitMs:50,until:0};assert.equal(no.command('g',{type:'gold',kind:'big'}),false);assert.equal(g.gold,10000);
 });
-test('BOOST-1 keeps its 10-minute clock and compact map while Gold rate is controlled by the administrator',()=>{
+test('BOOST-1 keeps its 10-minute clock and requested 32000 map while Gold rate is controlled by the administrator',()=>{
  const now=Date.parse('2026-10-30T10:03:00Z'),w=new World('BOOST-1',{now,continuous:true}),p=w.addPlayer('p',{gold:2000});
- assert.equal(w.size,4500);assert.equal(w.roundEnd-w.roundStart,600000);
+ assert.equal(w.size,32000);assert.equal(w.roundEnd-w.roundStart,600000);
  assert.equal(roomTiming('FFA-2',now).endsAt%3600000,Math.floor(3600000/87));
  assert.equal(w.command('p',{type:'boost'}),false);w.command('p',{type:'gold',kind:'big'});assert.equal(p.gold,1900);
  w.step(.05,w.roundEnd);assert.equal(w.roundEnd-w.roundStart,600000);
